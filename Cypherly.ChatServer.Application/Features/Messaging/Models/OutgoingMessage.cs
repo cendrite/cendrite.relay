@@ -1,0 +1,13 @@
+﻿namespace Cypherly.ChatServer.Application.Features.Messaging.Models;
+
+/// <summary>
+/// Model representing an outgoing message to be sent to a recipient.
+/// </summary>
+public sealed class OutgoingMessage
+{
+    public required Guid Id { get; init; }
+    public required Guid SenderId { get; init; }
+    public required Guid RecipientId { get; init; }
+    public required Guid ChatId { get; init; }
+    public required string Content { get; init; }
+}

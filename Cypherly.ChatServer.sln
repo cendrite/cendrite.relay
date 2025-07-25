@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{973A626B-DBBF-4898-B36F-7A3E270F3B6B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{84E19276-1C9B-45C9-A25B-0EC470E744B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{F450600D-A9E2-4D4B-ACB6-37B2E5DF01F7}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		nuget.config = nuget.config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.API", "Cypherly.ChatServer.API\Cypherly.ChatServer.API.csproj", "{99EA02C7-779A-4C74-BB01-7AF123031DC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.Application", "Cypherly.ChatServer.Application\Cypherly.ChatServer.Application.csproj", "{39E7219C-18F5-4A5A-87FF-7445D6961F2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.Domain", "Cypherly.ChatServer.Domain\Cypherly.ChatServer.Domain.csproj", "{52B81A07-1F07-49C6-A69F-D10C595905A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.Infrastructure", "Cypherly.ChatServer.Infrastructure\Cypherly.ChatServer.Infrastructure.csproj", "{D43FD557-F60A-4B33-B260-A3C68188ED57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.Test.Integration", "Cypherly.ChatServer.Test.Integration\Cypherly.ChatServer.Test.Integration.csproj", "{A0CA188D-8F5B-46A7-AD56-64B14D94D28E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.Test.Unit", "Cypherly.ChatServer.Test.Unit\Cypherly.ChatServer.Test.Unit.csproj", "{A7DB5777-FC3D-4BAB-B098-AB19B33BB3E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{99EA02C7-779A-4C74-BB01-7AF123031DC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99EA02C7-779A-4C74-BB01-7AF123031DC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99EA02C7-779A-4C74-BB01-7AF123031DC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99EA02C7-779A-4C74-BB01-7AF123031DC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39E7219C-18F5-4A5A-87FF-7445D6961F2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39E7219C-18F5-4A5A-87FF-7445D6961F2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39E7219C-18F5-4A5A-87FF-7445D6961F2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39E7219C-18F5-4A5A-87FF-7445D6961F2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52B81A07-1F07-49C6-A69F-D10C595905A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52B81A07-1F07-49C6-A69F-D10C595905A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52B81A07-1F07-49C6-A69F-D10C595905A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52B81A07-1F07-49C6-A69F-D10C595905A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D43FD557-F60A-4B33-B260-A3C68188ED57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D43FD557-F60A-4B33-B260-A3C68188ED57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D43FD557-F60A-4B33-B260-A3C68188ED57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D43FD557-F60A-4B33-B260-A3C68188ED57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0CA188D-8F5B-46A7-AD56-64B14D94D28E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0CA188D-8F5B-46A7-AD56-64B14D94D28E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0CA188D-8F5B-46A7-AD56-64B14D94D28E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0CA188D-8F5B-46A7-AD56-64B14D94D28E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7DB5777-FC3D-4BAB-B098-AB19B33BB3E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7DB5777-FC3D-4BAB-B098-AB19B33BB3E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7DB5777-FC3D-4BAB-B098-AB19B33BB3E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7DB5777-FC3D-4BAB-B098-AB19B33BB3E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{99EA02C7-779A-4C74-BB01-7AF123031DC6} = {973A626B-DBBF-4898-B36F-7A3E270F3B6B}
+		{39E7219C-18F5-4A5A-87FF-7445D6961F2A} = {973A626B-DBBF-4898-B36F-7A3E270F3B6B}
+		{52B81A07-1F07-49C6-A69F-D10C595905A1} = {973A626B-DBBF-4898-B36F-7A3E270F3B6B}
+		{D43FD557-F60A-4B33-B260-A3C68188ED57} = {973A626B-DBBF-4898-B36F-7A3E270F3B6B}
+		{A0CA188D-8F5B-46A7-AD56-64B14D94D28E} = {84E19276-1C9B-45C9-A25B-0EC470E744B8}
+		{A7DB5777-FC3D-4BAB-B098-AB19B33BB3E3} = {84E19276-1C9B-45C9-A25B-0EC470E744B8}
+	EndGlobalSection
+EndGlobal
