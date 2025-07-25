@@ -10,17 +10,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		nuget.config = nuget.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.API", "Cypherly.ChatServer.API\Cypherly.ChatServer.API.csproj", "{99EA02C7-779A-4C74-BB01-7AF123031DC6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatServer.API", "ChatServer.API\ChatServer.API.csproj", "{99EA02C7-779A-4C74-BB01-7AF123031DC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.Application", "Cypherly.ChatServer.Application\Cypherly.ChatServer.Application.csproj", "{39E7219C-18F5-4A5A-87FF-7445D6961F2A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatServer.Application", "ChatServer.Application\ChatServer.Application.csproj", "{39E7219C-18F5-4A5A-87FF-7445D6961F2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.Domain", "Cypherly.ChatServer.Domain\Cypherly.ChatServer.Domain.csproj", "{52B81A07-1F07-49C6-A69F-D10C595905A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatServer.Domain", "ChatServer.Domain\ChatServer.Domain.csproj", "{52B81A07-1F07-49C6-A69F-D10C595905A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.Infrastructure", "Cypherly.ChatServer.Infrastructure\Cypherly.ChatServer.Infrastructure.csproj", "{D43FD557-F60A-4B33-B260-A3C68188ED57}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatServer.Infrastructure", "ChatServer.Infrastructure\ChatServer.Infrastructure.csproj", "{D43FD557-F60A-4B33-B260-A3C68188ED57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.Test.Integration", "Cypherly.ChatServer.Test.Integration\Cypherly.ChatServer.Test.Integration.csproj", "{A0CA188D-8F5B-46A7-AD56-64B14D94D28E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatServer.Test.Integration", "ChatServer.Test.Integration\ChatServer.Test.Integration.csproj", "{A0CA188D-8F5B-46A7-AD56-64B14D94D28E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cypherly.ChatServer.Test.Unit", "Cypherly.ChatServer.Test.Unit\Cypherly.ChatServer.Test.Unit.csproj", "{A7DB5777-FC3D-4BAB-B098-AB19B33BB3E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatServer.Test.Unit", "ChatServer.Test.Unit\ChatServer.Test.Unit.csproj", "{A7DB5777-FC3D-4BAB-B098-AB19B33BB3E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
