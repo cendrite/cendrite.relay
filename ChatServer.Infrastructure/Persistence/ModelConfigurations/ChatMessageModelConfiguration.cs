@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ChatServer.Infrastructure.Persistence.ModelConfigurations;
 
-public class ChatMessageModelConfiguration : IEntityTypeConfiguration<ChatMessage>
+public class ChatMessageModelConfiguration : BaseEntityTypeConfiguration<ChatMessage>
 {
-    public void Configure(EntityTypeBuilder<ChatMessage> builder)
+    public override void Configure(EntityTypeBuilder<ChatMessage> builder)
     {
         builder.ToTable("chat_message");
 
@@ -36,5 +36,7 @@ public class ChatMessageModelConfiguration : IEntityTypeConfiguration<ChatMessag
             .HasColumnName("status")
             .HasConversion<string>()
             .IsRequired();
+        
+        base.Configure(builder);
     }   
 }

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ChatServer.Infrastructure.Persistence.ModelConfigurations;
 
-public class ClientModelConfiguration : IEntityTypeConfiguration<Client>
+public class ClientModelConfiguration : BaseEntityTypeConfiguration<Client>
 {
-    public void Configure(EntityTypeBuilder<Client> builder)
+    public override void Configure(EntityTypeBuilder<Client> builder)
     {
         builder.ToTable("client");
 
@@ -30,5 +30,7 @@ public class ClientModelConfiguration : IEntityTypeConfiguration<Client>
             .WithOne()
             .HasForeignKey(x => x.RecipientId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        base.Configure(builder);
     }
 }
