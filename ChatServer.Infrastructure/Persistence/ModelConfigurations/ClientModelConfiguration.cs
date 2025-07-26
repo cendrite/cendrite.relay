@@ -8,17 +8,22 @@ public class ClientModelConfiguration : IEntityTypeConfiguration<Client>
 {
     public void Configure(EntityTypeBuilder<Client> builder)
     {
-        builder.ToTable("Clients");
+        builder.ToTable("client");
 
         builder.HasKey(x => x.Id);
+        
+        builder.Property(x => x.Id)
+            .HasColumnName("id")
+            .IsRequired();
 
         builder.Property(x => x.ConnectionId)
+            .HasColumnName("connection_id")
             .IsRequired();
 
         builder.HasIndex(x => x.ConnectionId)
+            .HasDatabaseName("idx_client_connection_id")
             .IsUnique();
 
-        // Only relevant for caching purposes in relation to SignalR connections
         builder.Ignore(x => x.TransientId);
 
         builder.HasMany(x => x.ChatMessages)
