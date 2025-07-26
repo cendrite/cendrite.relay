@@ -4,9 +4,9 @@ namespace ChatServer.Domain.Abstractions;
 public abstract class Entity
 {
     public Guid Id { get; init; }
-    public DateTime LastModified { get; protected set; }
+    public DateTime Updated { get; private set; }
     public DateTime Created { get; private set; }
-    public DateTime? DeletedAt { get; private set; }
+    public DateTime? Deleted { get; private set; }
 
     protected Entity(Guid id)
     {
@@ -17,20 +17,18 @@ public abstract class Entity
     {
 
     }
-
-
+    
     public void SetCreated() => Created = DateTime.UtcNow;
 
-    public void SetLastModified() => LastModified = DateTime.UtcNow;
+    public void SetLastModified() => Updated = DateTime.UtcNow;
 
-    public void SetDelete() => DeletedAt = DateTime.UtcNow;
+    public void SetDelete() => Deleted = DateTime.UtcNow;
 
-    public void RevertDelete() => DeletedAt = null;
+    public void RevertDelete() => Deleted = null;
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        var other = obj as Entity;
-        if (ReferenceEquals(other, null))
+        if (obj is not Entity other)
         {
             return false;
         }

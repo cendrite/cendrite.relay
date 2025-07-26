@@ -47,7 +47,7 @@ public class UnitOfWork(ChatServerDbContext context) : IUnitOfWork
     }
 
     /// <summary>
-    /// Updates the Created and LastModified timestamps for auditable entities.
+    /// Updates the Created and Updated timestamps for auditable entities.
     /// </summary>
     private void UpdateAuditableEntities()
     {
