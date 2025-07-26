@@ -2,7 +2,7 @@
 
 namespace ChatServer.Domain.Common;
 
-public class Errors
+public static class Errors
 {
     public static class General
     {
