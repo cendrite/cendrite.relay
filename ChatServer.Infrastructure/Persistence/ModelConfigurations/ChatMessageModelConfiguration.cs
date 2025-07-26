@@ -11,21 +11,30 @@ public class ChatMessageModelConfiguration : IEntityTypeConfiguration<ChatMessag
         builder.ToTable("chat_message");
 
         builder.HasKey(x => x.Id);
+        
+        builder.Property(x => x.Id)
+            .HasColumnName("id")
+            .IsRequired();
 
         builder.Property(x => x.SenderId)
+            .HasColumnName("sender_id")
             .IsRequired();
 
         builder.Property(x => x.RecipientId)
+            .HasColumnName("recipient_id")
             .IsRequired();
 
         builder.Property(x => x.ChatId)
+            .HasColumnName("chat_id")
             .IsRequired();
 
         builder.Property(x => x.Content)
+            .HasColumnName("content")
             .IsRequired();
 
         builder.Property(x => x.Status)
+            .HasColumnName("status")
             .HasConversion<string>()
             .IsRequired();
-    }
+    }   
 }
