@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env: 
+    env:
       DOCKER_BUILDKIT: 1
     steps:
       - name: Checkout Code
@@ -22,14 +22,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          
+
       - name: Create NuGet token file
         run: echo "${{ secrets.NUGET_TOKEN }}" > nuget_token.txt
 
       - name: Build and Push Docker Image for Cypherly.Chatserver.API
         run: |
           docker buildx build --platform linux/amd64 \
-            --secret id=nuget_token,src=nuget_token.txt
+            --secret id=nuget_token,src=nuget_token.txt \
             -t ${{ secrets.DOCKER_USERNAME }}/dev-cypherly-chatserver-api:latest \
             -f ChatServer.API/Dockerfile . \
             --push
