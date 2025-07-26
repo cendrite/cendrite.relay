@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ChatServer.Infrastructure.Persistence.ModelConfigurations;
 
-public class ChatmessageModelConfiguration : IEntityTypeConfiguration<ChatMessage>
+public class ChatMessageModelConfiguration : IEntityTypeConfiguration<ChatMessage>
 {
     public void Configure(EntityTypeBuilder<ChatMessage> builder)
     {
-        builder.ToTable("Chatmessage");
+        builder.ToTable("chat_message");
 
         builder.HasKey(x => x.Id);
 

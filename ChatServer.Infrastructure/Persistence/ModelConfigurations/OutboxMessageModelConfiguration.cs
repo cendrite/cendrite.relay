@@ -2,13 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Cypherly.Persistence.ModelConfigurations;
+namespace ChatServer.Infrastructure.Persistence.ModelConfigurations;
 
 public class OutboxMessageModelConfiguration : IEntityTypeConfiguration<OutboxMessage>
 {
     public void Configure(EntityTypeBuilder<OutboxMessage> builder)
     {
-        builder.ToTable("OutboxMessage");
+        builder.ToTable("outbox_message");
 
         builder.HasKey(x => x.Id);
 
