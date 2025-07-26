@@ -28,6 +28,9 @@ public class ChatMessageModelConfiguration : BaseEntityTypeConfiguration<ChatMes
             .HasColumnName("chat_id")
             .IsRequired();
 
+        builder.Property(x => x.MessageToken)
+            .HasColumnName("message_token");
+
         builder.Property(x => x.Content)
             .HasColumnName("content")
             .IsRequired();
