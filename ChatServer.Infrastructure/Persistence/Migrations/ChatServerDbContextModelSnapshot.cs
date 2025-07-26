@@ -79,7 +79,8 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .HasColumnName("deleted");
 
                     b.Property<Guid>("MessageToken")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("message_token");
 
                     b.Property<Guid>("RecipientId")
                         .HasColumnType("uuid")
