@@ -13,7 +13,7 @@ public static class InfrastructureExtensions
         services.ConfigureSettings(configuration);
         services.AddPersistence(configuration, assembly);
         services.AddConnectionMultiplexer(configuration);
-        services.AddMassTransitWithRabbitMq(Assembly.GetExecutingAssembly());
+        services.AddMassTransitWithRabbitMq(Assembly.Load("ChatServer.Application"));
         services.AddValkey();
         return services;
     }
