@@ -12,24 +12,18 @@ namespace ChatServer.Infrastructure.Extensions;
 internal static class MassTransitExtensions
 {
     /// <summary>
-    /// Configures Masstransit with RabbitMQ, including retry and circut breaker policies.
+    /// Configures Masstransit with RabbitMQ, including retry and circuit breaker policies.
     /// Optionally allows configuring sagas or MassTransit components.
     /// Not providing a RabbitMqConfig will default to using the default endpoint configuration/>
     /// </summary>
     /// <param name="services">The service collection to add Masstransit to</param>
     /// <param name="consumerAssembly">The assembly containing consumers to register</param>
-    /// <param name="masstransitConfig">Optional configuration for adding sagas or additional MassTransit Components</param>
-    /// <param name="rabbitMqConfig">Additional RabbitMq Extensions(Endpoints, consumers[...])</param>
     /// <returns>The ServiceCollection <see cref="ServiceCollection"/></returns>
     /// <exception cref="InvalidOperationException">Exception thrown if RabbitMq <see cref="RabbitMqSettings"/> settings aren't configured; resulting in missing values for connection</exception>
-    internal static IServiceCollection AddMassTransitWithRabbitMq(this IServiceCollection services,
-        Assembly consumerAssembly, Action<IBusRegistrationConfigurator>? masstransitConfig = null,
-        Action<IRabbitMqBusFactoryConfigurator, IBusRegistrationContext>? rabbitMqConfig = null)
+    internal static void AddMassTransitWithRabbitMq(this IServiceCollection services, Assembly consumerAssembly)
     {
         services.AddMassTransit(x =>
         {
-            masstransitConfig?.Invoke(x);
-
             x.AddConsumers(consumerAssembly);
 
             x.UsingRabbitMq((context, cfg) =>
@@ -55,20 +49,11 @@ internal static class MassTransitExtensions
                     cb.ResetInterval = TimeSpan.FromMinutes(5);
                 });
 
-                if (rabbitMqConfig != null)
-                {
-                    rabbitMqConfig.Invoke(cfg, context);
-                }
-                else
-                {
-                    cfg.ConfigureEndpoints(context);
-                }
+                cfg.ConfigureEndpoints(context);
             });
         });
 
         services.AddProducer<ClientConnectedMessage>();
-
-        return services;
     }
 
     /// <summary>

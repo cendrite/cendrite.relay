@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using ChatServer.Application.Features.ChangeEvent.Handlers;
 using ChatServer.Infrastructure.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,7 @@ public static class InfrastructureExtensions
         services.ConfigureSettings(configuration);
         services.AddPersistence(configuration, assembly);
         services.AddConnectionMultiplexer(configuration);
-        services.AddMassTransitWithRabbitMq(Assembly.GetExecutingAssembly());
+        services.AddMassTransitWithRabbitMq(typeof(FriendDeletedConsumer).Assembly);
         services.AddValkey();
         return services;
     }
