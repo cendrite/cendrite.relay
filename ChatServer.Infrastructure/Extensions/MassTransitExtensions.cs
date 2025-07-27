@@ -17,7 +17,7 @@ internal static class MassTransitExtensions
     /// Not providing a RabbitMqConfig will default to using the default endpoint configuration/>
     /// </summary>
     /// <param name="services">The service collection to add Masstransit to</param>
-    /// <param name="consumerAssembly">The assembly containing consumers to register</param>>
+    /// <param name="consumerAssembly">The assembly containing consumers to register</param>
     /// <returns>The ServiceCollection <see cref="ServiceCollection"/></returns>
     /// <exception cref="InvalidOperationException">Exception thrown if RabbitMq <see cref="RabbitMqSettings"/> settings aren't configured; resulting in missing values for connection</exception>
     internal static void AddMassTransitWithRabbitMq(this IServiceCollection services, Assembly consumerAssembly)
