@@ -5,7 +5,7 @@ namespace ChatServer.Application.Cache.Client;
 public class ClientCacheDto
 {
     public Guid ConnectionId { get; private set; }
-    public Dictionary<HubType, string> TransientIds { get; private set; } = new();
+    public Dictionary<HubType, string> TransientIds { get; private set; } = [];
 
     public ClientCacheDto(Guid connectionId, Dictionary<HubType, string> transientIds)
     {
