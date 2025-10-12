@@ -15,9 +15,9 @@ public class CreateClientConsumerTest
     private readonly IClientRepository _fakeRepository;
     private readonly IUnitOfWork _fakeUnitOfWork;
     private readonly Fixture _fixture = new();
-    
+
     private readonly CreateClientConsumer _sut;
-    
+
     public CreateClientConsumerTest()
     {
         _fakeRepository = A.Fake<IClientRepository>();
