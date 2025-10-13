@@ -1,7 +1,6 @@
 using System.Reflection.Metadata;
+using ChatServer.Domain.Abstractions;
 using ChatServer.Domain.Entities;
-using Abstractions_AggregateRoot = ChatServer.Domain.Abstractions.AggregateRoot;
-using AggregateRoot = ChatServer.Domain.Abstractions.AggregateRoot;
 
 // ReSharper disable ConvertToPrimaryConstructor
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
@@ -9,7 +8,7 @@ using AggregateRoot = ChatServer.Domain.Abstractions.AggregateRoot;
 
 namespace ChatServer.Domain.Aggregates;
 
-public class Client : Abstractions_AggregateRoot
+public class Client : AggregateRoot 
 {
     /// <summary>
     /// ConnectionId is used send msg between clients and serves as a stable identifier for the SignalR connection.

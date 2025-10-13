@@ -11,4 +11,5 @@ public enum ChangeEventType
     FriendRemoved,
     UserBlocked,
     UserUnblocked,
+    UserLoggedOut,
 }
