@@ -22,7 +22,6 @@ public sealed class ClientLogoutConsumer(
     {
         try
         {
-
             var response = await connectionIdsClient.GetResponse<ConnectionIdsResponse>(new ConnectionIdsProxyMessage
             {
                 CorrelationId = context.Message.CorrelationId,
@@ -37,24 +36,28 @@ public sealed class ClientLogoutConsumer(
             }
 
             var connectionIds = response.Message.ConnectionIds?.SelectMany(kv => kv.Value).Distinct().ToList() ?? [];
-            foreach(var connectionId in connectionIds)
+
+            foreach (var connectionId in connectionIds)
             {
                 var client = await clientCache.GetAsync(connectionId);
-                if (client?.GetTransientId(HubType.ChangeEvent) is null)
+
+                if (client?.GetTransientId(HubType.ChangeEvent) is not null and var id)
+                {
+                    await notifier.NotifyAsync(id, new Base.ChangeEvent(
+                                Guid.NewGuid(),
+                                ChangeEventType.UserLoggedOut,
+                                "UserLogout",
+                                "User logged out",
+                                new UserLoggedOutEvent
+                                {
+                                    ConnectionId = connectionId
+                                }));
+
+                }
+                else
                 {
                     logger.LogWarning("Clients not found for connection ID: {ConnectionId}", connectionId);
-                    continue;
                 }
-
-                await notifier.NotifyAsync(client.TransientIds[HubType.ChangeEvent], new Base.ChangeEvent(
-                    Guid.NewGuid(),
-                    ChangeEventType.UserLoggedOut,
-                    "UserLogout",
-                    "User logged out",
-                    new UserLoggedOutEvent 
-                    {
-                        ConnectionId = connectionId
-                    })); 
             }
         }
         catch (Exception ex)
