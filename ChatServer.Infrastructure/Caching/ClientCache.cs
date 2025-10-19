@@ -1,5 +1,4 @@
 ﻿using ChatServer.Application.Cache.Client;
-using ChatServer.Application.Contracts;
 using ChatServer.Application.Contracts.Cache;
 
 namespace ChatServer.Infrastructure.Caching;
@@ -56,10 +55,7 @@ public class ClientCache(IValkeyCacheService valkeyCacheService) : IClientCache
     /// <param name="cancellationToken"></param>
     public async Task RemoveAsync(Guid id, CancellationToken cancellationToken)
     {
-        var client = await GetAsync(id, cancellationToken);
-        if (client is null)
-            throw new NullReferenceException("Clients not found in cache when attempting to remove");
-
+        var client = await GetAsync(id, cancellationToken) ?? throw new NullReferenceException("Clients not found in cache when attempting to remove");
         await valkeyCacheService.RemoveAsync(id.ToString(), cancellationToken);
 
         foreach (var transientId in client.TransientIds.Values)

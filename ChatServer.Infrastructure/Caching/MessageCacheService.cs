@@ -1,5 +1,4 @@
-﻿using ChatServer.Application.Contracts;
-using ChatServer.Application.Contracts.Cache;
+﻿using ChatServer.Application.Contracts.Cache;
 using ChatServer.Domain.Entities;
 using StackExchange.Redis;
 
