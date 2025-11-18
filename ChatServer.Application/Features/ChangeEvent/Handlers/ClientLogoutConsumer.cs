@@ -1,5 +1,6 @@
 using ChatServer.Application.Contracts;
 using ChatServer.Application.Contracts.Cache;
+using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Base;
 using ChatServer.Application.Features.ChangeEvent.Event;
@@ -14,6 +15,8 @@ namespace ChatServer.Application.Features.ChangeEvent.Handlers;
 public sealed class ClientLogoutConsumer(
         IChangeEventNotifier notifier,
         IClientCache clientCache,
+        IClientRepository clientRepository,
+        IUnitOfWork unitOfWork,
         IRequestClient<ConnectionIdsProxyMessage> connectionIdsClient,
         ILogger<ClientLogoutConsumer> logger)
         : IConsumer<UserLogoutMessage>
@@ -34,7 +37,7 @@ public sealed class ClientLogoutConsumer(
                 logger.LogError("Failed to retrieve connection IDs for user logout: Error: {Error}, DeviceID: {DeviceId}", response.Message.Error, context.Message.DeviceId);
                 throw new Exception("Failed to retrieve connection IDs for user logout");
             }
-
+            
             var connectionIds = response.Message.ConnectionIds?.SelectMany(kv => kv.Value).Distinct().ToList() ?? [];
 
             foreach (var connectionId in connectionIds)
@@ -59,6 +62,9 @@ public sealed class ClientLogoutConsumer(
                     logger.LogWarning("Clients not found for connection ID: {ConnectionId}", connectionId);
                 }
             }
+
+            await clientRepository.DeleteAsync(context.Message.DeviceId);
+            await unitOfWork.SaveChangesAsync();
         }
         catch (Exception ex)
         {
