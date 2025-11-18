@@ -63,7 +63,7 @@ public sealed class ClientLogoutConsumer(
                 }
             }
 
-            await clientRepository.DeleteAsync(context.Message.DeviceId);
+            await clientRepository.DeleteAsync(context.Message.DeviceId, context.CancellationToken);
             await unitOfWork.SaveChangesAsync();
         }
         catch (Exception ex)

@@ -31,7 +31,7 @@ public class ConnectClientCommandHandlerTest
         // Arrange
         var clientId = Guid.NewGuid();
 
-        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId)).Returns((Client)null!);
+        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns((Client)null!);
 
 
         var command = new ConnectClientCommand()
@@ -45,7 +45,7 @@ public class ConnectClientCommandHandlerTest
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeCache.AddAsync(A<ClientCacheDto>._, A<CancellationToken>._)).MustNotHaveHappened();
         A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustNotHaveHappened();
         result.Success.Should().BeFalse();
@@ -58,7 +58,7 @@ public class ConnectClientCommandHandlerTest
         var clientId = Guid.NewGuid();
         var client = new Client(Guid.NewGuid(), Guid.NewGuid());
 
-        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId)).Returns(client);
+        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
         A.CallTo(() => _fakeCache.GetAsync(client.ConnectionId, A<CancellationToken>._))
             .Returns((ClientCacheDto?)null);
 
@@ -73,7 +73,7 @@ public class ConnectClientCommandHandlerTest
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeCache.AddAsync(A<ClientCacheDto>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         result.Success.Should().BeTrue();
@@ -86,7 +86,7 @@ public class ConnectClientCommandHandlerTest
         var clientId = Guid.NewGuid();
         var client = new Client(Guid.NewGuid(), Guid.NewGuid());
 
-        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId)).Returns(client);
+        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
         A.CallTo(() => _fakeCache.GetAsync(client.ConnectionId, A<CancellationToken>._))
             .Returns((ClientCacheDto?)null);
         A.CallTo(() => _fakeCache.AddAsync(A<ClientCacheDto>._, A<CancellationToken>._)).Throws<Exception>();
@@ -102,7 +102,7 @@ public class ConnectClientCommandHandlerTest
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeCache.AddAsync(A<ClientCacheDto>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustNotHaveHappened();
         result.Success.Should().BeFalse();
