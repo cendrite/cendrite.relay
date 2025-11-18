@@ -2,6 +2,7 @@ using AutoFixture;
 using ChatServer.Application.Cache.Client;
 using ChatServer.Application.Contracts;
 using ChatServer.Application.Contracts.Cache;
+using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Handlers;
 using ChatServer.Domain.Aggregates;
@@ -20,6 +21,8 @@ public sealed class ClientLogoutConsumerTest
     private readonly IChangeEventNotifier _fakeChangeEventNotifier;
     private readonly IClientCache _fakeClientCache;
     private readonly IRequestClient<ConnectionIdsProxyMessage> _fakeConnectionIdsClient;
+    private readonly IClientRepository _fakeClientRepository;
+    private readonly IUnitOfWork _fakeUnitOfWork;
 
     private readonly ClientLogoutConsumer _sut;
 
@@ -28,9 +31,17 @@ public sealed class ClientLogoutConsumerTest
         _fakeChangeEventNotifier = A.Fake<IChangeEventNotifier>();
         _fakeClientCache = A.Fake<IClientCache>();
         _fakeConnectionIdsClient = A.Fake<IRequestClient<ConnectionIdsProxyMessage>>();
+        _fakeClientRepository = A.Fake<IClientRepository>();
+        _fakeUnitOfWork = A.Fake<IUnitOfWork>();
         var fakeLogger = A.Fake<ILogger<ClientLogoutConsumer>>();
 
-        _sut = new ClientLogoutConsumer(_fakeChangeEventNotifier, _fakeClientCache, _fakeConnectionIdsClient, fakeLogger);
+        _sut = new ClientLogoutConsumer(
+                _fakeChangeEventNotifier, 
+                _fakeClientCache, 
+                _fakeClientRepository,
+                _fakeUnitOfWork,
+                _fakeConnectionIdsClient, 
+                fakeLogger);
     }
 
     [Fact]

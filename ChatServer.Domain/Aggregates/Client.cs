@@ -1,4 +1,3 @@
-using System.Reflection.Metadata;
 using ChatServer.Domain.Abstractions;
 using ChatServer.Domain.Entities;
 
@@ -21,11 +20,12 @@ public class Client : AggregateRoot
     /// </summary>
     public string? TransientId { get; private set; }
 
-    private List<ChatMessage> _chatMessages = [];
+    private readonly List<ChatMessage> _chatMessages = [];
 
     public IReadOnlyCollection<ChatMessage> ChatMessages => _chatMessages;
 
     private Client() : base(Guid.Empty) { } // For EF Core
+
     public Client(Guid id, Guid connectionId) : base(id)
     {
         ConnectionId = connectionId;

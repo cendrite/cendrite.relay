@@ -1,5 +1,5 @@
-﻿using System.Security.Claims;
-using ChatServer.API.Clients;
+﻿using ChatServer.API.Clients;
+using ChatServer.API.Common;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Client.Commands.Connect;
 using ChatServer.Application.Features.Client.Commands.Disconnect;
@@ -15,35 +15,27 @@ public class BaseHub<T>(
 {
     public async override Task OnConnectedAsync()
     {
-        var httpContext = Context.GetHttpContext();
-        var deviceId = httpContext.User.FindFirst("sub")?.Value;
+        var deviceId = GetDeviceId();
+        ValidateDeviceId(deviceId);
 
         logger.LogInformation("OnConnectedAsync triggered for connection: {ConnectionId}", Context.ConnectionId);
 
-        if (deviceId != null && Guid.TryParse(deviceId, out var deviceIdGuid))
+        var result = await sender.Send(new ConnectClientCommand
         {
-            var result = await sender.Send(new ConnectClientCommand
-            {
-                ClientId = deviceIdGuid,
-                TransientId = Context.ConnectionId,
-                HubType = GetHubType()
-            });
+            ClientId = deviceId,
+            TransientId = Context.ConnectionId,
+            HubType = GetHubType()
+        });
 
-            if (result.Success is false)
-            {
-                logger.LogWarning("ConnectClientCommand failed for client: {ClientId}", deviceIdGuid);
-                Context.Abort();
-                return;
-            }
-            logger.LogInformation("Clients connected: {ClientId}, TransientId: {TransientId}",
-                deviceIdGuid, Context.ConnectionId);
-        }
-        else
+        if (result.Success is false)
         {
-            logger.LogWarning("Clients connection failed: {ClientId}", deviceId);
+            logger.LogWarning("ConnectClientCommand failed for client: {ClientId}", deviceId);
             Context.Abort();
             return;
         }
+        logger.LogInformation("Clients connected: {ClientId}, TransientId: {TransientId}",
+            deviceId, Context.ConnectionId);
+
         await base.OnConnectedAsync();
     }
 
@@ -64,4 +56,21 @@ public class BaseHub<T>(
 
         throw new InvalidOperationException($"Unsupported hub type for {typeof(T).Name}");
     }
+
+    private Guid GetDeviceId()
+    {
+        var ctx = Context.GetHttpContext() ?? throw new InvalidOperationException("HTTP Context is null.");
+        return ctx.User.GetDeviceId();
+    }
+
+    private void ValidateDeviceId(Guid deviceId)
+    {
+        if (deviceId == Guid.Empty)
+        {
+            logger.LogError("DeviceId claim is missing or invalid.");
+            Context.Abort();
+            throw new InvalidOperationException("Invalid or missing DeviceId in claims.");
+        }
+    }
+
 }

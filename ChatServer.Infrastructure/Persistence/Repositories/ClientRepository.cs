@@ -1,4 +1,3 @@
-using ChatServer.Application.Contracts;
 using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Domain.Aggregates;
 using ChatServer.Infrastructure.Persistence.Context;
@@ -13,14 +12,9 @@ public class ClientRepository(ChatServerDbContext context) : IClientRepository
         await context.Client.AddAsync(entity);
     }
 
-    public Task DeleteAsync(Client entity)
+    public async Task<Client> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
-
-    public async Task<Client?> GetByIdAsync(Guid id)
-    {
-        return await context.Client.FindAsync(id);
+        return await context.Client.FindAsync(id) ?? throw new InvalidOperationException($"Client with ID {id} not found.");
     }
 
     public Task UpdateAsync(Client entity)
@@ -38,5 +32,16 @@ public class ClientRepository(ChatServerDbContext context) : IClientRepository
         }
 
         return query.FirstOrDefaultAsync(c => c.Id == id);
+    }
+
+    public void Delete(Client entity)
+    {
+        context.Client.Remove(entity); 
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        var entity = context.Client.Find(id) ?? throw new InvalidOperationException($"Client with ID {id} not found.");
+        context.Client.Remove(entity);
     }
 }
