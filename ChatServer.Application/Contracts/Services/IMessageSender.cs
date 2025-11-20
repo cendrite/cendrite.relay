@@ -1,6 +1,6 @@
 ﻿using ChatServer.Application.Features.Messaging.Models;
 
-namespace ChatServer.Application.Contracts;
+namespace ChatServer.Application.Contracts.Services;
 
 public interface IMessageSender
 {

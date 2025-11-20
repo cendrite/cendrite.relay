@@ -1,8 +1,8 @@
 using AutoFixture;
 using ChatServer.Application.Cache.Client;
-using ChatServer.Application.Contracts;
 using ChatServer.Application.Contracts.Cache;
 using ChatServer.Application.Contracts.Repositories;
+using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Handlers;
 using ChatServer.Domain.Aggregates;

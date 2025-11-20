@@ -1,6 +1,6 @@
 ﻿using ChatServer.API.Clients;
 using ChatServer.API.Hubs;
-using ChatServer.Application.Contracts;
+using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Features.Messaging.Models;
 using Microsoft.AspNetCore.SignalR;
 

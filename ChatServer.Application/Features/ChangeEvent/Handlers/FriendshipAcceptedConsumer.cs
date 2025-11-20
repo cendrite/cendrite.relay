@@ -1,5 +1,5 @@
-﻿using ChatServer.Application.Contracts;
-using ChatServer.Application.Contracts.Cache;
+﻿using ChatServer.Application.Contracts.Cache;
+using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Base;
 using ChatServer.Application.Features.ChangeEvent.Event;

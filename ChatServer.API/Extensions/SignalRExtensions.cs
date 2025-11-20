@@ -1,5 +1,5 @@
 ﻿using ChatServer.API.Handlers;
-using ChatServer.Application.Contracts;
+using ChatServer.Application.Contracts.Services;
 using StackExchange.Redis;
 
 namespace ChatServer.API.Extensions;

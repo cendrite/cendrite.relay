@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using ChatServer.Application.Cache.Client;
-using ChatServer.Application.Contracts;
 using ChatServer.Application.Contracts.Cache;
+using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Handlers;
 using ChatServer.Domain.Aggregates;
@@ -52,7 +52,7 @@ public class ProfilePictureUpdatedConsumerTest
 
         // Assert
         A.CallTo(() => _fakeChangeEventNotifier.NotifyAsync(clientCacheDto.GetTransientId(HubType.ChangeEvent)!,
-                A<global::ChatServer.Application.Features.ChangeEvent.Base.ChangeEvent>._,
+                A<Application.Features.ChangeEvent.Base.ChangeEvent>._,
                 A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }

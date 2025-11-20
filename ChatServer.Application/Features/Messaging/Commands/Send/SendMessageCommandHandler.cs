@@ -1,7 +1,7 @@
 ﻿using ChatServer.Application.Abstractions;
 using ChatServer.Application.Cache.Client;
-using ChatServer.Application.Contracts;
 using ChatServer.Application.Contracts.Cache;
+using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Messaging.Models;
 using ChatServer.Domain.Common;
