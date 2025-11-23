@@ -1,6 +1,6 @@
-﻿using ChatServer.Application.Features.ChangeEvent.Base;
+using ChatServer.Application.Features.ChangeEvent.Base;
 
-namespace ChatServer.Application.Contracts;
+namespace ChatServer.Application.Contracts.Services;
 
 public interface IChangeEventNotifier
 {
