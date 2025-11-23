@@ -2,16 +2,10 @@
 
 namespace ChatServer.Application.Cache.Client;
 
-public class ClientCacheDto
+public class ClientCacheDto(Guid connectionId, Dictionary<HubType, string> transientIds)
 {
-    public Guid ConnectionId { get; private set; }
-    public Dictionary<HubType, string> TransientIds { get; private set; } = [];
-
-    public ClientCacheDto(Guid connectionId, Dictionary<HubType, string> transientIds)
-    {
-        ConnectionId = connectionId;
-        TransientIds = transientIds;
-    }
+    public Guid ConnectionId { get; private set; } = connectionId;
+    public Dictionary<HubType, string> TransientIds { get; private set; } = transientIds;
 
     public void AddTransientId(string connectionId, HubType hubType)
     {
@@ -26,5 +20,4 @@ public class ClientCacheDto
     {
         return TransientIds.GetValueOrDefault(hubType);
     }
-
 }

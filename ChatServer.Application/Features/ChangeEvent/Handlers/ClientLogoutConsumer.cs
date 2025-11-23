@@ -13,36 +13,36 @@ using Microsoft.Extensions.Logging;
 namespace ChatServer.Application.Features.ChangeEvent.Handlers;
 
 public sealed class ClientLogoutConsumer(
-        IChangeEventNotifier notifier,
-        IClientCache clientCache,
-        IClientRepository clientRepository,
-        IUnitOfWork unitOfWork,
-        IRequestClient<ConnectionIdsProxyMessage> connectionIdsClient,
-        ILogger<ClientLogoutConsumer> logger)
-        : IConsumer<UserLogoutMessage>
+    IChangeEventNotifier notifier,
+    IClientCache clientCache,
+    IClientRepository clientRepository,
+    IUnitOfWork unitOfWork,
+    IRequestClient<ConnectionIdsProxyMessage> connectionIdsClient,
+    ILogger<ClientLogoutConsumer> logger)
+    : IConsumer<UserLogoutMessage>
 {
     public async Task Consume(ConsumeContext<UserLogoutMessage> context)
     {
         try
         {
-            var connectionIds = await GetConnectionIds(context.Message);
+            var proxyResult = await GetConnectionIds(context.Message);
 
-            foreach (var connectionId in connectionIds)
+            foreach (var connectionId in proxyResult.Item2)
             {
                 var client = await clientCache.GetAsync(connectionId);
 
                 if (client?.GetTransientId(HubType.ChangeEvent) is not null and var id)
                 {
                     await notifier.NotifyAsync(id, new Base.ChangeEvent(
-                                Guid.NewGuid(),
-                                ChangeEventType.UserLoggedOut,
-                                "UserLogout",
-                                "User logged out",
-                                new UserLoggedOutEvent
-                                {
-                                    ConnectionId = connectionId
-                                }));
-
+                        Guid.NewGuid(),
+                        ChangeEventType.UserLoggedOut,
+                        "UserLogout",
+                        "User logged out",
+                        new UserLoggedOutEvent
+                        {
+                            UserTag = proxyResult.Item1,
+                            ConnectionId = connectionId
+                        }));
                 }
                 else
                 {
@@ -60,21 +60,23 @@ public sealed class ClientLogoutConsumer(
         }
     }
 
-    private async Task<IReadOnlyCollection<Guid>> GetConnectionIds(UserLogoutMessage message)
+    private async Task<(string, IReadOnlyCollection<Guid>)> GetConnectionIds(UserLogoutMessage message)
     {
-        var response = await connectionIdsClient.GetResponse<ConnectionIdsResponse>(new ConnectionIdsProxyMessage
+        var response = await connectionIdsClient.GetResponse<ConnectionIdsProxyResponse>(new ConnectionIdsProxyMessage
         {
             CorrelationId = message.CorrelationId,
             CausationId = message.Id,
             TenantId = message.UserId
         });
 
-        if (response.Message.IsSuccess is false)
+        if (!response.Message.IsSuccess)
         {
-            logger.LogError("Failed to retrieve connection IDs for user logout: Error: {Error}, DeviceID: {DeviceId}", response.Message.Error, message.DeviceId);
+            logger.LogError("Failed to retrieve connection IDs for user logout: Error: {Error}, DeviceID: {DeviceId}",
+                response.Message.Error, message.DeviceId);
             throw new Exception("Failed to retrieve connection IDs for user logout");
         }
 
-        return response.Message.ConnectionIds?.SelectMany(kv => kv.Value).Distinct().ToList() ?? [];
+        return new ValueTuple<string, IReadOnlyCollection<Guid>>(response.Message.UserTag,
+            response.Message.ConnectionIds?.SelectMany(kv => kv.Value).Distinct().ToList() ?? []);
     }
 }

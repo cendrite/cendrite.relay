@@ -53,20 +53,21 @@ public sealed class ClientLogoutConsumerTest
             .With(c => c.DeviceId, client.Id)
             .Create();
 
-        var connectionIdsResponse = new ConnectionIdsResponse
+        var connectionIdsResponse = new ConnectionIdsProxyResponse 
         {
             CorrelationId = userLogoutMessage.CorrelationId,
             IsSuccess = true,
             ConnectionIds = new Dictionary<Guid, List<Guid>>
             {
                 { userLogoutMessage.UserId, new List<Guid> { client.ConnectionId } }
-            }
+            },
+            UserTag = "someTag"
         };
 
-        var responseMessage = A.Fake<Response<ConnectionIdsResponse>>();
+        var responseMessage = A.Fake<Response<ConnectionIdsProxyResponse>>();
         A.CallTo(() => responseMessage.Message).Returns(connectionIdsResponse);
 
-        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsResponse>(A<ConnectionIdsProxyMessage>._, A<CancellationToken>._, A<RequestTimeout>._))
+        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsProxyResponse>(A<ConnectionIdsProxyMessage>._, A<CancellationToken>._, A<RequestTimeout>._))
             .Returns(Task.FromResult(responseMessage));
 
         var clientCacheDto = new ClientCacheDto(client.ConnectionId, new Dictionary<HubType, string>()
@@ -88,7 +89,7 @@ public sealed class ClientLogoutConsumerTest
                 A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsResponse>(
+        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsProxyResponse>(
                 A<ConnectionIdsProxyMessage>.That.Matches(msg =>
                     msg.CorrelationId == userLogoutMessage.CorrelationId &&
                     msg.CausationId == userLogoutMessage.Id &&
@@ -105,16 +106,17 @@ public sealed class ClientLogoutConsumerTest
         var userLogoutMessage = _fixture.Create<UserLogoutMessage>();
         var fakeConsumeContext = A.Fake<ConsumeContext<UserLogoutMessage>>();
         A.CallTo(() => fakeConsumeContext.Message).Returns(userLogoutMessage);
-        var connectionIdsResponse = new ConnectionIdsResponse
+        var connectionIdsResponse = new ConnectionIdsProxyResponse 
         {
             CorrelationId = userLogoutMessage.CorrelationId,
             IsSuccess = true,
-            ConnectionIds = []
+            ConnectionIds = [],
+            UserTag = "someTag"
         };
 
-        var responseMessage = A.Fake<Response<ConnectionIdsResponse>>();
+        var responseMessage = A.Fake<Response<ConnectionIdsProxyResponse>>();
         A.CallTo(() => responseMessage.Message).Returns(connectionIdsResponse);
-        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsResponse>(A<ConnectionIdsProxyMessage>._, A<CancellationToken>._, A<RequestTimeout>._))
+        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsProxyResponse>(A<ConnectionIdsProxyMessage>._, A<CancellationToken>._, A<RequestTimeout>._))
             .Returns(Task.FromResult(responseMessage));
 
         // Act
@@ -124,7 +126,7 @@ public sealed class ClientLogoutConsumerTest
         A.CallTo(() => _fakeChangeEventNotifier.NotifyAsync(A<string>._, A<Application.Features.ChangeEvent.Base.ChangeEvent>._, A<CancellationToken>._))
             .MustNotHaveHappened(); 
 
-        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsResponse>(
+        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsProxyResponse>(
                 A<ConnectionIdsProxyMessage>.That.Matches(msg =>
                     msg.CorrelationId == userLogoutMessage.CorrelationId &&
                     msg.CausationId == userLogoutMessage.Id &&
@@ -142,16 +144,17 @@ public sealed class ClientLogoutConsumerTest
         var fakeConsumeContext = A.Fake<ConsumeContext<UserLogoutMessage>>();
         A.CallTo(() => fakeConsumeContext.Message).Returns(userLogoutMessage);
 
-        var connectionIdsResponse = new ConnectionIdsResponse
+        var connectionIdsResponse = new ConnectionIdsProxyResponse 
         {
             CorrelationId = userLogoutMessage.CorrelationId,
             IsSuccess = false,
-            Error = "Some error"
+            Error = "Some error",
+            UserTag = "someTag"
         };
 
-        var responseMessage = A.Fake<Response<ConnectionIdsResponse>>();
+        var responseMessage = A.Fake<Response<ConnectionIdsProxyResponse>>();
         A.CallTo(() => responseMessage.Message).Returns(connectionIdsResponse);
-        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsResponse>(A<ConnectionIdsProxyMessage>._, A<CancellationToken>._, A<RequestTimeout>._))
+        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsProxyResponse>(A<ConnectionIdsProxyMessage>._, A<CancellationToken>._, A<RequestTimeout>._))
             .Returns(Task.FromResult(responseMessage)); 
 
         // Act & Assert
@@ -160,7 +163,7 @@ public sealed class ClientLogoutConsumerTest
         A.CallTo(() => _fakeChangeEventNotifier.NotifyAsync(A<string>._, A<Application.Features.ChangeEvent.Base.ChangeEvent>._, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsResponse>(
+        A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsProxyResponse>(
                 A<ConnectionIdsProxyMessage>.That.Matches(msg =>
                     msg.CorrelationId == userLogoutMessage.CorrelationId &&
                     msg.CausationId == userLogoutMessage.Id &&
