@@ -41,7 +41,7 @@ namespace ChatServer.Application.Features.ChangeEvent.Handlers
                             new UserLoggedInEvent
                             {
                                 UserTag = proxyResult.Item1,
-                                ConnectionId = connectionId
+                                ConnectionId = context.Message.ConnectionId,
                             }));
                     }
                 }
