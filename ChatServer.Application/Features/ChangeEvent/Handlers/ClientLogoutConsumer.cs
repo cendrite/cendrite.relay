@@ -41,7 +41,7 @@ public sealed class ClientLogoutConsumer(
                         new UserLoggedOutEvent
                         {
                             UserTag = proxyResult.Item1,
-                            ConnectionId = connectionId
+                            ConnectionId = context.Message.ConnectionId,
                         }));
                 }
                 else
