@@ -25,7 +25,7 @@ public class
     public async Task CacheMessageAsync_Should_CacheMessage()
     {
         // Arrange
-        var message = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "secret chat message");
+        var message = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid().ToString(), Guid.NewGuid(), "secret chat message");
 
         // Act
         await _sut.CacheMessageAsync(message, CancellationToken.None);
@@ -44,8 +44,8 @@ public class
     {
         // Arrange
         var recipientId = Guid.NewGuid();
-        var message1 = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), recipientId, Guid.NewGuid(), Guid.NewGuid(), "secret chat message 1");
-        var message2 = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), recipientId, Guid.NewGuid(), Guid.NewGuid(), "secret chat message 1");
+        var message1 = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), recipientId, Guid.NewGuid().ToString(), Guid.NewGuid(), "secret chat message 1");
+        var message2 = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), recipientId, Guid.NewGuid().ToString(), Guid.NewGuid(), "secret chat message 1");
         await _sut.CacheMessageAsync(message1, CancellationToken.None);
         await _sut.CacheMessageAsync(message2, CancellationToken.None);
 
@@ -64,7 +64,7 @@ public class
     {
         // Arrange
         var recipientId = Guid.NewGuid();
-        var message = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), recipientId, Guid.NewGuid(), Guid.NewGuid(), "secret chat message");
+        var message = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), recipientId, Guid.NewGuid().ToString(), Guid.NewGuid(), "secret chat message");
         await _sut.CacheMessageAsync(message, CancellationToken.None);
 
         // Act
@@ -83,7 +83,7 @@ public class
         // Arrange
         for (var i = 0; i < 100; i++)
         {
-            var message = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), $"secret chat message {i}");
+            var message = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid().ToString(), Guid.NewGuid(), $"secret chat message {i}");
             await _sut.CacheMessageAsync(message, CancellationToken.None);
         }
 
@@ -103,7 +103,7 @@ public class
         var messages = new List<ChatMessage>();
         for (var i = 0; i < 100; i++)
         {
-            var message = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), $"secret chat message {i}");
+            var message = new ChatMessage(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid().ToString(), Guid.NewGuid(), $"secret chat message {i}");
             messages.Add(message);
             await _sut.CacheMessageAsync(message, CancellationToken.None);
         }
