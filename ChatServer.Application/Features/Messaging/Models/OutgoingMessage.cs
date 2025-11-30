@@ -8,6 +8,6 @@ public sealed class OutgoingMessage
     public required Guid Id { get; init; }
     public required Guid SenderId { get; init; }
     public required Guid RecipientId { get; init; }
-    public required Guid ChatId { get; init; }
+    public required string ChatId { get; init; }
     public required string Content { get; init; }
 }

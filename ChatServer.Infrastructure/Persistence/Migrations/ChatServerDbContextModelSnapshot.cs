@@ -61,8 +61,9 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("ChatId")
-                        .HasColumnType("uuid")
+                    b.Property<string>("ChatId")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("chat_id");
 
                     b.Property<string>("Content")
