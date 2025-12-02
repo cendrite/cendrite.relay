@@ -72,9 +72,8 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
 try
 {
+    logger.LogInformation("Starting ChatServer API");
     app.Run();
-    logger.LogInformation("Application started successfully");
-
 }
 catch (Exception ex)
 {
