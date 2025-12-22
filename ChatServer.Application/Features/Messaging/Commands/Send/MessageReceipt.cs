@@ -2,7 +2,7 @@
 
 public enum MessageReceipt
 {
-    Sent,
-    Delivered,
-    Failed
+    Sent = 1,
+    Delivered = 2,
+    Failed = 3
 }
