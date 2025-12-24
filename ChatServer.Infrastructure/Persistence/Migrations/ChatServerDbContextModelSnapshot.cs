@@ -91,11 +91,6 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("sender_id");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("status");
-
                     b.Property<DateTime>("Updated")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated");

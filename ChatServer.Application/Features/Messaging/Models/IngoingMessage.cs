@@ -9,10 +9,11 @@ public sealed class IngoingMessage
 {
     public required Guid Id { get; init; }
     public required string ChatId { get; init; }
-    public required Guid RecipientId { get; init; }
     public required Guid SenderId { get; init; }
+    public required Guid RecipientId { get; init; }
+    public required int PayloadType { get; init; }
+    public required string Payload { get; init; } = null!;
     public required Guid MessageToken { get; init; }
-    public required string Content { get; init; } = null!;
 
     public ChatMessage MapToChatMessage()
     {
@@ -22,7 +23,7 @@ public sealed class IngoingMessage
             recipientId: RecipientId,
             chatId: ChatId,
             messageToken: MessageToken,
-            content: Content);
+            content: Payload);
     }
 
     public OutgoingMessage MapToOutgoingMessage()
@@ -33,7 +34,8 @@ public sealed class IngoingMessage
             SenderId = SenderId,
             RecipientId = RecipientId,
             ChatId = ChatId,
-            Content = Content
+            PayloadType = PayloadType,
+            Payload = Payload
         };
     }
 }
