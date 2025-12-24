@@ -11,4 +11,5 @@ public sealed class OutgoingMessage
     public required string ChatId { get; init; }
     public required int PayloadType { get; init; }
     public required string Payload { get; init; }
+    public required DateTimeOffset Timestamp { get; init; }
 }

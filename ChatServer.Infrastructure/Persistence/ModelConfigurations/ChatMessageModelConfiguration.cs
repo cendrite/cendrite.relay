@@ -1,4 +1,5 @@
-﻿using ChatServer.Domain.Entities;
+﻿using System.Xml.Schema;
+using ChatServer.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -33,6 +34,10 @@ public class ChatMessageModelConfiguration : BaseEntityTypeConfiguration<ChatMes
 
         builder.Property(x => x.Content)
             .HasColumnName("content")
+            .IsRequired();
+        
+        builder.Property(x=> x.Timestamp)
+            .HasColumnName("timestamp")
             .IsRequired();
         
         base.Configure(builder);
