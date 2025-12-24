@@ -9,6 +9,7 @@ public class ChatMessage : Entity
     public Guid RecipientId { get; init; }
     public Guid MessageToken { get; init; }
     public string Content { get; init; } = null!;
+    public DateTime Timestamp { get; init; }
 
     public ChatMessage() { }
 

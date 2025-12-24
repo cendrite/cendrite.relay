@@ -14,6 +14,7 @@ public sealed class IngoingMessage
     public required int PayloadType { get; init; }
     public required string Payload { get; init; } = null!;
     public required Guid MessageToken { get; init; }
+    public required DateTimeOffset Timestamp { get; init; }
 
     public ChatMessage MapToChatMessage()
     {
@@ -35,7 +36,8 @@ public sealed class IngoingMessage
             RecipientId = RecipientId,
             ChatId = ChatId,
             PayloadType = PayloadType,
-            Payload = Payload
+            Payload = Payload,
+            Timestamp = Timestamp
         };
     }
 }
