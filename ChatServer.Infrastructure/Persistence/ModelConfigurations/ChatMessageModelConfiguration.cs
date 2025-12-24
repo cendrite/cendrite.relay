@@ -34,11 +34,6 @@ public class ChatMessageModelConfiguration : BaseEntityTypeConfiguration<ChatMes
         builder.Property(x => x.Content)
             .HasColumnName("content")
             .IsRequired();
-
-        builder.Property(x => x.Status)
-            .HasColumnName("status")
-            .HasConversion<string>()
-            .IsRequired();
         
         base.Configure(builder);
     }   

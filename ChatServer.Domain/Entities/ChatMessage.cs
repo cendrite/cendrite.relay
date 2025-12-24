@@ -1,16 +1,14 @@
 using ChatServer.Domain.Abstractions;
-using ChatServer.Domain.Enums;
 
 namespace ChatServer.Domain.Entities;
 
 public class ChatMessage : Entity
 {
+    public string ChatId { get; init; } = null!;
     public Guid SenderId { get; init; }
     public Guid RecipientId { get; init; }
-    public string ChatId { get; init; } = null!;
     public Guid MessageToken { get; init; }
     public string Content { get; init; } = null!;
-    public MessageStatus Status { get; set; }
 
     public ChatMessage() { }
 
@@ -21,16 +19,5 @@ public class ChatMessage : Entity
         ChatId = chatId;
         MessageToken = messageToken;
         Content = content;
-        Status = MessageStatus.Sent;
-    }
-
-    public void MarkAsDelivered()
-    {
-        Status = MessageStatus.Delivered;
-    }
-
-    public void MarkAsRead()
-    {
-        Status = MessageStatus.Read;
     }
 }
