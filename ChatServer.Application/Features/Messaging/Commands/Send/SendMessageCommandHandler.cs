@@ -24,6 +24,7 @@ public sealed class SendMessageCommandHandler(
             var workItems = request.Bundle.Select(WorkItem.BuildItem).ToList();
 
             logger.LogInformation("Processing {Count} incoming messages", workItems.Count);
+            logger.LogDebug("Messages: {Messages}", workItems.Select(wi => wi.ChatMessage));
 
             var receipt = await ProcessMessages(workItems, cancellationToken);
 
