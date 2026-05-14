@@ -12,14 +12,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.0" />
-      <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.1" />
-      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0-preview.4.25258.110" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
-      <PackageReference Include="Quartz" Version="3.13.0" />
-      <PackageReference Include="Quartz.Extensions.Hosting" Version="3.13.0" />
-      <PackageReference Include="StackExchange.Redis" Version="2.8.24" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.9" />
+      <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.8" />
+      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.8" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+      <PackageReference Include="Quartz" Version="3.18.1" />
+      <PackageReference Include="Quartz.Extensions.Hosting" Version="3.18.1" />
+      <PackageReference Include="StackExchange.Redis" Version="2.13.1" />
     </ItemGroup>
 
     <ItemGroup>
