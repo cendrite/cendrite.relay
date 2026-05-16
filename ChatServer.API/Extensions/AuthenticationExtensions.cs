@@ -20,6 +20,7 @@ public static class AuthenticationExtensions
 
         services.AddAuthentication().AddJwtBearer(options =>
         {
+            options.RequireHttpsMetadata = false;
             options.Authority = authority;
             options.Audience = audience;
             options.TokenValidationParameters = new TokenValidationParameters
