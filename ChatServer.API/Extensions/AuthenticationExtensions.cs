@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -10,18 +9,25 @@ public static class AuthenticationExtensions
     public static void SetupAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+
+        var authority = configuration["Jwt:Issuer"] 
+            ?? throw new NotImplementedException("MISSING VALUE IN JWT SETTINGS Jwt:Issuer");
+
+        var audience = configuration["Jwt:Audience"] 
+            ?? throw new NotImplementedException("MISSING VALUE IN JWT SETTINGS Jwt:Audience");
+
         services.AddAuthentication().AddJwtBearer(options =>
         {
-            options.TokenValidationParameters = new()
+            options.Authority = authority;
+            options.Audience = audience;
+            options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["Jwt:Issuer"] ?? throw new NotImplementedException($"MISSING VALUE IN JWT SETTINGS {configuration["Jwt:Issuer"]}"),
-                ValidAudience = configuration["Jwt:Audience"] ?? throw new NotImplementedException($"MISSING VALUE IN JWT SETTINGS {configuration["Jwt:Audience"]}"),
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"] ??
-                                                                                   throw new NotImplementedException("MISSING VALUE IN JWT SETTINGS Jwt:Secret"))),
+                ValidIssuer = authority,
+                ValidAudience = audience,
             };
 
             options.Events = new JwtBearerEvents()
@@ -55,7 +61,5 @@ public static class AuthenticationExtensions
                 }
             };
         });
-
     }
-
 }
