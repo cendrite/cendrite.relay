@@ -6,7 +6,7 @@ namespace ChatServer.API.Extensions;
 
 public static class AuthenticationExtensions
 {
-    public static void SetupAuthentication(
+    public static void AddAuthentication(
         this IServiceCollection services, 
         IConfiguration configuration)
     {
@@ -63,5 +63,7 @@ public static class AuthenticationExtensions
                 }
             };
         });
+
+        services.AddAuthorization();
     }
 }

@@ -27,11 +27,9 @@ builder.Services.AddApplication(Assembly.Load("ChatServer.Application"));
 
 builder.Services.AddInfrastructure(configuration, Assembly.Load("ChatServer.Infrastructure"));
 
+builder.Services.AddAuthentication(configuration);
+
 builder.Services.ConfigureSignalR();
-
-builder.Services.SetupAuthentication(configuration);
-
-builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
 {
