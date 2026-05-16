@@ -6,7 +6,9 @@ namespace ChatServer.API.Extensions;
 
 public static class AuthenticationExtensions
 {
-    public static void SetupAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static void SetupAuthentication(
+        this IServiceCollection services, 
+        IConfiguration configuration)
     {
         JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
