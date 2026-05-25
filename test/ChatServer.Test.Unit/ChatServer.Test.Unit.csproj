@@ -30,7 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ChatServer.Application\ChatServer.Application.csproj" />
+      <ProjectReference Include="..\..\src\ChatServer.Application\ChatServer.Application.csproj" />
     </ItemGroup>
 
 </Project>
