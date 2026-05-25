@@ -35,7 +35,7 @@ public class FriendshipAcceptedConsumer(
                     Username = message.Username,
                     Tag = message.Tag,
                     DisplayName = message.DisplayName,
-                    ProfilePictureUrl = message.ProfilePictureUrl,
+                    AvatarKey = message.AvatarKey,
                     ConnectionIds = message.ConnectionIds
                 };
 

@@ -12,21 +12,21 @@ using Microsoft.Extensions.Logging;
 
 namespace ChatServer.Test.Unit.ChangeEvent;
 
-public class ProfilePictureUpdatedConsumerTest
+public class AvatarUpdatedConsumerTest
 {
     private readonly Fixture _fixture = new();
     private readonly IChangeEventNotifier _fakeChangeEventNotifier;
     private readonly IClientCache _fakeClientCache;
 
-    private readonly ProfilePictureUpdatedConsumer _sut;
+    private readonly AvatarUpdatedConsumer _sut;
 
-    public ProfilePictureUpdatedConsumerTest()
+    public AvatarUpdatedConsumerTest()
     {
         _fakeChangeEventNotifier = A.Fake<IChangeEventNotifier>();
         _fakeClientCache = A.Fake<IClientCache>();
-        var fakeLogger = A.Fake<ILogger<ProfilePictureUpdatedConsumer>>();
+        var fakeLogger = A.Fake<ILogger<AvatarUpdatedConsumer>>();
 
-        _sut = new ProfilePictureUpdatedConsumer(_fakeChangeEventNotifier, _fakeClientCache, fakeLogger);
+        _sut = new AvatarUpdatedConsumer(_fakeChangeEventNotifier, _fakeClientCache, fakeLogger);
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public class ProfilePictureUpdatedConsumerTest
     {
         // Arrange
         var client = new Client(Guid.NewGuid(), Guid.NewGuid());
-        var profilePictureUpdatedMessage = _fixture.Build<ProfilePictureUpdatedMessage>()
+        var profilePictureUpdatedMessage = _fixture.Build<AvatarUpdatedMessage>()
             .With(c => c.ConnectionIds, [client.ConnectionId]).Create();
 
         var clientCacheDto = new ClientCacheDto(client.ConnectionId, new Dictionary<HubType, string>()
@@ -44,7 +44,7 @@ public class ProfilePictureUpdatedConsumerTest
 
         A.CallTo(() => _fakeClientCache.GetAsync(client.ConnectionId, CancellationToken.None)).Returns(clientCacheDto);
 
-        var fakeConsumeContext = A.Fake<ConsumeContext<ProfilePictureUpdatedMessage>>();
+        var fakeConsumeContext = A.Fake<ConsumeContext<AvatarUpdatedMessage>>();
         A.CallTo(() => fakeConsumeContext.Message).Returns(profilePictureUpdatedMessage);
 
         // Act
@@ -60,8 +60,8 @@ public class ProfilePictureUpdatedConsumerTest
     [Fact]
     public async Task Consume_Given_No_Clients_Should_Not_Notify()
     {
-        var profilePictureUpdatedMessage = _fixture.Create<ProfilePictureUpdatedMessage>();
-        var fakeConsumeContext = A.Fake<ConsumeContext<ProfilePictureUpdatedMessage>>();
+        var profilePictureUpdatedMessage = _fixture.Create<AvatarUpdatedMessage>();
+        var fakeConsumeContext = A.Fake<ConsumeContext<AvatarUpdatedMessage>>();
         A.CallTo(() => fakeConsumeContext.Message).Returns(profilePictureUpdatedMessage);
 
         await _sut.Consume(fakeConsumeContext);
