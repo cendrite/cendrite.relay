@@ -31,5 +31,5 @@ jobs:
           docker buildx build --platform linux/amd64 \
             --secret id=nuget_token,src=nuget_token.txt \
             -t ${{ secrets.DOCKER_USERNAME }}/dev-cypherly-chatserver-api:latest \
-            -f ChatServer.API/Dockerfile . \
+            -f src/ChatServer.API/Dockerfile . \
             --push

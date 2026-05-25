@@ -12,16 +12,16 @@ COPY nuget.config .
 RUN --mount=type=secret,id=nuget_token \
     sed -i "s|%NUGET_TOKEN%|$(cat /run/secrets/nuget_token)|g" nuget.config
 
-COPY ["ChatServer.API/ChatServer.API.csproj", "ChatServer.API/"]
-COPY ["ChatServer.Application/ChatServer.Application.csproj", "ChatServer.Application/"]
-COPY ["ChatServer.Domain/ChatServer.Domain.csproj", "ChatServer.Domain/"]
-COPY ["ChatServer.Infrastructure/ChatServer.Infrastructure.csproj", "ChatServer.Infrastructure/"]
+COPY ["src/ChatServer.API/ChatServer.API.csproj", "src/ChatServer.API/"]
+COPY ["src/ChatServer.Application/ChatServer.Application.csproj", "src/ChatServer.Application/"]
+COPY ["src/ChatServer.Domain/ChatServer.Domain.csproj", "src/ChatServer.Domain/"]
+COPY ["src/ChatServer.Infrastructure/ChatServer.Infrastructure.csproj", "src/ChatServer.Infrastructure/"]
 
-RUN dotnet restore "ChatServer.API/ChatServer.API.csproj" --configfile nuget.config
+RUN dotnet restore "src/ChatServer.API/ChatServer.API.csproj" --configfile nuget.config
 
 COPY . .
 
-WORKDIR "/src/ChatServer.API"
+WORKDIR "/src/src/ChatServer.API"
 RUN dotnet build "./ChatServer.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
