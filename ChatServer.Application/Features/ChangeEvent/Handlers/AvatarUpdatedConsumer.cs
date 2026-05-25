@@ -9,19 +9,19 @@ using Microsoft.Extensions.Logging;
 
 namespace ChatServer.Application.Features.ChangeEvent.Handlers;
 
-public class ProfilePictureUpdatedConsumer(
+public class AvatarUpdatedConsumer(
     IChangeEventNotifier changeEventNotifier,
     IClientCache clientCache,
-    ILogger<ProfilePictureUpdatedConsumer> logger)
-    : IConsumer<ProfilePictureUpdatedMessage>
+    ILogger<AvatarUpdatedConsumer> logger)
+    : IConsumer<AvatarUpdatedMessage>
 {
-    public async Task Consume(ConsumeContext<ProfilePictureUpdatedMessage> context)
+    public async Task Consume(ConsumeContext<AvatarUpdatedMessage> context)
     {
         try
         {
             logger.LogInformation("received ProfilePictureUpdatedMessage: {@Message}", context.Message);
             var message = context.Message;
-            var eventData = new ProfilePictureUpdatedChangeEvent(message.UserTag, message.ProfilePictureUrl);
+            var eventData = new AvatarUpdatedEvent(message.UserTag, message.AvatarKey);
             var changeEvent = new Base.ChangeEvent(Guid.NewGuid(), ChangeEventType.ProfilePictureChanged, "UserProfile", "Profile picture updated", eventData);
 
             foreach (var connectionId in message.ConnectionIds)

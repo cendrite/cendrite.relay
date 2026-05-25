@@ -7,5 +7,5 @@ public class FriendRequestEvent
     public required DateTime RequestedAt { get; init; }
     public bool IsSeen { get; init; }
     public string? DisplayName { get; set; }
-    public string? PresignedProfilePictureUrl { get; set; }
+    public Guid? AvatarKey { get; set; }
 }

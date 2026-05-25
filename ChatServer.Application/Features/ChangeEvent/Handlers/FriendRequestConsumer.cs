@@ -37,7 +37,7 @@ public class FriendRequestConsumer(
                     RequestedAt = message.FriendRequestDate,
                     IsSeen = message.IsSeen,
                     DisplayName = message.FriendDisplayName,
-                    PresignedProfilePictureUrl = message.FriendProfilePictureUrl
+                    AvatarKey = message.AvatarKey
                 };
 
                 var changeEvent = new Base.ChangeEvent(
