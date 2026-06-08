@@ -2,7 +2,7 @@
 
 public enum ChangeEventType
 {
-    ProfilePictureChanged,
+    AvatarChanged,
     DisplayNameChanged,
     StatusChanged,
     FriendRequestSent,

@@ -19,10 +19,10 @@ public class AvatarUpdatedConsumer(
     {
         try
         {
-            logger.LogInformation("received ProfilePictureUpdatedMessage: {@Message}", context.Message);
+            logger.LogInformation("received AvatarUpdatedMessage: {@Message}", context.Message);
             var message = context.Message;
             var eventData = new AvatarUpdatedEvent(message.UserTag, message.AvatarKey);
-            var changeEvent = new Base.ChangeEvent(Guid.NewGuid(), ChangeEventType.ProfilePictureChanged, "UserProfile", "Profile picture updated", eventData);
+            var changeEvent = new Base.ChangeEvent(Guid.NewGuid(), ChangeEventType.AvatarChanged, "UserProfile", "Profile picture updated", eventData);
 
             foreach (var connectionId in message.ConnectionIds)
             {
@@ -38,7 +38,7 @@ public class AvatarUpdatedConsumer(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error processing ProfilePictureUpdatedMessage");
+            logger.LogError(ex, "Error processing AvatarUpdatedMessage: {@Message}", context.Message);
             throw;
         }
     }
