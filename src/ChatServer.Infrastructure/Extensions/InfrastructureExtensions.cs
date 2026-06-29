@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using ChatServer.Application.Features.ChangeEvent.Handlers;
+using ChatServer.Infrastructure.Services;
 using ChatServer.Infrastructure.Settings;
+using ChatServer.Infrastructure.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,20 +10,27 @@ namespace ChatServer.Infrastructure.Extensions;
 
 public static class InfrastructureExtensions
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration, Assembly assembly)
+    public static void AddInfrastructure(this IServiceCollection svc, IConfiguration cfg, Assembly asm)
     {
-        services.AddOutboxProcessingJob(assembly);
-        services.ConfigureSettings(configuration);
-        services.AddPersistence(configuration, assembly);
-        services.AddConnectionMultiplexer(configuration);
-        services.AddMassTransitWithRabbitMq(typeof(FriendDeletedConsumer).Assembly);
-        services.AddValkey();
-        return services;
+        svc.AddOutboxProcessingJob(asm);
+        svc.ConfigureSettings(cfg);
+        svc.AddPersistence(cfg, asm);
+        svc.AddConnectionMultiplexer(cfg);
+        svc.AddMassTransitWithRabbitMq(typeof(FriendDeletedConsumer).Assembly);
+        svc.AddValkey();
+        svc.AddServices();
     }
 
-    private static void ConfigureSettings(this IServiceCollection services, IConfiguration configuration)
+    private static void AddServices(this IServiceCollection svc)
     {
-        services.Configure<ValkeySettings>(configuration.GetSection("Valkey"));
-        services.Configure<RabbitMqSettings>(configuration.GetSection("RabbitMq"));
+        svc.AddSingleton<IBlobStore, BlobStore>();
+        svc.AddSingleton<IMediaService, MediaService>();
+    }
+
+    private static void ConfigureSettings(this IServiceCollection svc, IConfiguration cfg)
+    {
+        svc.Configure<ValkeySettings>(cfg.GetSection("Valkey"));
+        svc.Configure<RabbitMqSettings>(cfg.GetSection("RabbitMq"));
+        svc.Configure<BlobStoreSettings>(cfg.GetSection("BlobStore"));
     }
 }

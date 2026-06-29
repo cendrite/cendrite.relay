@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Testcontainers.PostgreSql;
 
 namespace ChatServer.Test.Integration.Setup;
@@ -16,6 +18,8 @@ namespace ChatServer.Test.Integration.Setup;
 public class IntegrationTestFactory<TProgram, TDbContext> : WebApplicationFactory<TProgram>, IAsyncLifetime
     where TProgram : class where TDbContext : DbContext
 {
+    private readonly string StorageDirectory = Path.Combine(Directory.GetCurrentDirectory());
+
     private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
         .WithImage("postgres:latest")
         .WithCleanUp(true)
@@ -37,7 +41,6 @@ public class IntegrationTestFactory<TProgram, TDbContext> : WebApplicationFactor
         builder.ConfigureServices(services =>
         {
 
-            #region Database Extensions
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<TDbContext>));
 
@@ -52,20 +55,12 @@ public class IntegrationTestFactory<TProgram, TDbContext> : WebApplicationFactor
                     b => b.MigrationsAssembly(typeof(TDbContext).Assembly.FullName));
             });
 
-            #endregion
-
-            #region Auth Extensions
-
             // Mock out authentication and authorization for testing
             services.AddAuthentication("Test")
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
 
             services.AddAuthorizationBuilder()
                 .AddPolicy("User", policy => policy.RequireAssertion(_ => true));
-
-            #endregion
-
-            #region RabbitMq Extensions
 
             var rmqDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IBusControl));
 
@@ -77,9 +72,6 @@ public class IntegrationTestFactory<TProgram, TDbContext> : WebApplicationFactor
                 cfg.AddConsumers(typeof(TProgram).Assembly);
             });
 
-            #endregion
-
-            #region Valkey Extensions
 
             services.Configure<ValkeySettings>(options =>
             {
@@ -87,9 +79,26 @@ public class IntegrationTestFactory<TProgram, TDbContext> : WebApplicationFactor
                 options.Port = ValkeyPort; // The mapped port for the Valkey container
             });
 
-            #endregion
-
+            SetupBlobstore(services);
         });
+    }
+
+    private void SetupBlobstore(IServiceCollection services)
+    {
+        Directory.CreateDirectory(StorageDirectory);
+
+        services.RemoveAll(typeof(IConfigureOptions<BlobStoreSettings>));
+
+        var inMemorySettings = new Dictionary<string, string>
+        {
+            { "BlobStore:Root",  StorageDirectory }
+        };
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings!)
+            .Build();
+
+        services.Configure<BlobStoreSettings>(configuration.GetSection("BlobStore"));
     }
 
     public async Task InitializeAsync()

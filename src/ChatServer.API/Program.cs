@@ -4,8 +4,6 @@ using ChatServer.API.Hubs;
 using ChatServer.Application.Extensions;
 using ChatServer.Infrastructure.Extensions;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-
 var builder = WebApplication.CreateBuilder(args);
 
 var env = builder.Environment;
@@ -16,6 +14,7 @@ configuration.AddJsonFile("appsettings.json", false, true)
 
 if (env.IsDevelopment())
 {
+
     configuration.AddJsonFile($"appsettings.{Environments.Development}.json", true, true);
     configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 }
@@ -44,10 +43,17 @@ builder.Services.AddCors(options =>
 });
 
 
+builder.Services.AddEndpoints();
+
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddOpenApi();
+
 var app = builder.Build();
+
+app.RegisterMinimalEndpoints();
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -58,6 +64,8 @@ if (env.IsProduction())
 }
 
 app.UseCors("AllowElectron");
+
+app.MapOpenApi();
 
 app.UseAuthentication();
 
