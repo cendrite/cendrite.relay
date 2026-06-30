@@ -3,6 +3,7 @@ using ChatServer.API.Extensions;
 using ChatServer.API.Hubs;
 using ChatServer.Application.Extensions;
 using ChatServer.Infrastructure.Extensions;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,21 +43,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-
 builder.Services.AddEndpoints();
-
-builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
 app.RegisterMinimalEndpoints();
-
-app.UseSwagger();
-app.UseSwaggerUI();
 
 if (env.IsProduction())
 {
@@ -65,10 +58,18 @@ if (env.IsProduction())
 
 app.UseCors("AllowElectron");
 
+
 app.MapOpenApi();
 
-app.UseAuthentication();
+app.MapScalarApiReference(options =>
+{
+    options.WithTitle("Keystore.API V1")
+        .WithTheme(ScalarTheme.Purple)
+        .HideDarkModeToggle()
+        .WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Axios);
+});
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHub<ChangeEventHub>("change-eventhub");
