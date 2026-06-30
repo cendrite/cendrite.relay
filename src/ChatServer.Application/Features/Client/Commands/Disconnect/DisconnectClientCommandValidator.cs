@@ -1,4 +1,3 @@
-using ChatServer.Domain.Common;
 using FluentValidation;
 
 namespace ChatServer.Application.Features.Client.Commands.Disconnect;
@@ -9,6 +8,6 @@ public class DisconnectCommandValidator : AbstractValidator<DisconnectClientComm
     {
         RuleFor(x => x.TransientId)
             .NotEmpty()
-            .WithMessage(Errors.General.ValueIsRequired(nameof(DisconnectClientCommand.TransientId)).Message);
+            .WithMessage($"Value '{nameof(DisconnectClientCommand.TransientId)}' is required.");
     }
 }

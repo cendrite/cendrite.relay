@@ -42,7 +42,7 @@ public class CreateClientConsumer(
             {
                 CausationId = message.CorrelationId,
                 CorrelationId = message.CorrelationId,
-                Error = Errors.General.UnspecifiedError("An exception occured while attempting to create a client").Message,
+                Error = Error.Failure("An exception occured while attempting to create a client").Description,
                 IsSuccess = false
             });
         }
