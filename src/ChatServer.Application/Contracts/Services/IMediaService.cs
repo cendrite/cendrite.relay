@@ -1,4 +1,6 @@
-public interface IMediaService 
+namespace ChatServer.Application.Contracts.Services;
+
+public interface IMediaService
 {
-    public Task<string> StoreAsync(string id, Stream content, CancellationToken ct = default);
+    public Task StoreAsync(string id, Stream content, CancellationToken ct = default);
 }

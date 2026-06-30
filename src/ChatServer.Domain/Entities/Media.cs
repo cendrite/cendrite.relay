@@ -10,7 +10,7 @@ public class Media : Entity
 
     public Media() { }
 
-    public Media(Guid id, string mediaId, Guid clientId) : base(id)
+    public Media(string mediaId, Guid clientId) : base(Guid.Empty)
     {
         MediaId = mediaId;
         ClientId = clientId;

@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Features.ChangeEvent.Handlers;
 using ChatServer.Infrastructure.Services;
 using ChatServer.Infrastructure.Settings;
