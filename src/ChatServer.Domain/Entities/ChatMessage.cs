@@ -2,14 +2,15 @@ using ChatServer.Domain.Abstractions;
 
 namespace ChatServer.Domain.Entities;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 public class ChatMessage : Entity
 {
-    public string ChatId { get; init; } = null!;
-    public Guid SenderId { get; init; }
-    public Guid RecipientId { get; init; }
-    public Guid MessageToken { get; init; }
-    public string Content { get; init; } = null!;
-    public DateTime Timestamp { get; init; }
+    public string ChatId { get; private set; } 
+    public Guid SenderId { get; private set; }
+    public Guid RecipientId { get; private set; }
+    public Guid MessageToken { get; private set; }
+    public string Content { get; private set; } 
+    public DateTime Timestamp { get; private set; }
 
     public ChatMessage() { }
 
