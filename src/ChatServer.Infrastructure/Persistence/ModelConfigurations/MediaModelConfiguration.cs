@@ -10,19 +10,18 @@ public class MediaModelConfiguration : BaseEntityTypeConfiguration<Media>
     {
         builder.ToTable("media");
 
-        builder.HasKey(x => x.Id);
-        
-        builder.Property(x => x.Id)
-            .HasColumnName("id")
-            .IsRequired();
+        builder.Ignore(e => e.Id);
 
-        builder.Property(x => x.SenderId)
-            .HasColumnName("sender_id")
+        builder.HasKey(x => x.MediaId)
+            .HasName("media_id");
+        
+        builder.Property(x => x.ClientId)
+            .HasColumnName("client_id")
             .IsRequired();
 
         builder.HasOne<Client>()
             .WithMany(x => x.Media)
-            .HasForeignKey(x => x.SenderId)
+            .HasForeignKey(x => x.ClientId)
             .OnDelete(DeleteBehavior.Cascade);
 
         base.Configure(builder);

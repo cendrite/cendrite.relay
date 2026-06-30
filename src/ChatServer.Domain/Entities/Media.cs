@@ -6,13 +6,13 @@ namespace ChatServer.Domain.Entities;
 public class Media : Entity 
 {
     public string MediaId { get; private set; }
-    public Guid SenderId { get; private set; }
+    public Guid ClientId { get; private set; }
 
     public Media() { }
 
-    public Media(Guid id, string mediaId, Guid senderId) : base(id)
+    public Media(Guid id, string mediaId, Guid clientId) : base(id)
     {
         MediaId = mediaId;
-        SenderId = senderId;
+        ClientId = clientId;
     }
 }
