@@ -43,7 +43,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-
 builder.Services.AddEndpoints();
 
 builder.Services.AddOpenApi();
