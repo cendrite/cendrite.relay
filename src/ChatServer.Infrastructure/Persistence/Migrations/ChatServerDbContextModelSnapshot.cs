@@ -109,7 +109,8 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("ChatServer.Domain.Entities.Media", b =>
                 {
                     b.Property<string>("MediaId")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("media_id");
 
                     b.Property<Guid>("ClientId")
                         .HasColumnType("uuid")

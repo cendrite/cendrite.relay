@@ -14,6 +14,10 @@ public class MediaModelConfiguration : BaseEntityTypeConfiguration<Media>
 
         builder.HasKey(x => x.MediaId)
             .HasName("media_id");
+
+        builder.Property(x => x.MediaId)
+            .HasColumnName("media_id")
+            .IsRequired();
         
         builder.Property(x => x.ClientId)
             .HasColumnName("client_id")
