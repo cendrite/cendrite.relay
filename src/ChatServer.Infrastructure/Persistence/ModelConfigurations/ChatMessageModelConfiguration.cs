@@ -1,5 +1,4 @@
-﻿using System.Xml.Schema;
-using ChatServer.Domain.Entities;
+﻿using ChatServer.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

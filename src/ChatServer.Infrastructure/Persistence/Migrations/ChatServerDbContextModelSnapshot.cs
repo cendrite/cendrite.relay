@@ -17,7 +17,7 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.12")
+                .HasAnnotation("ProductVersion", "10.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -106,6 +106,40 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                     b.ToTable("chat_message", (string)null);
                 });
 
+            modelBuilder.Entity("ChatServer.Domain.Entities.Media", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted");
+
+                    b.Property<string>("MediaId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sender_id");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("media", (string)null);
+                });
+
             modelBuilder.Entity("Cypherly.Persistence.Outbox.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -149,9 +183,20 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ChatServer.Domain.Entities.Media", b =>
+                {
+                    b.HasOne("ChatServer.Domain.Aggregates.Client", null)
+                        .WithMany("Media")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ChatServer.Domain.Aggregates.Client", b =>
                 {
                     b.Navigation("ChatMessages");
+
+                    b.Navigation("Media");
                 });
 #pragma warning restore 612, 618
         }
