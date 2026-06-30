@@ -1,4 +1,3 @@
-using ChatServer.Domain.Common;
 using FluentValidation;
 
 namespace ChatServer.Application.Features.Client.Commands.Connect;
@@ -9,10 +8,10 @@ public class ConnectClientCommandValidator : AbstractValidator<ConnectClientComm
     {
         RuleFor(x => x.ClientId)
             .NotEmpty()
-            .WithMessage(Errors.General.ValueIsEmpty(nameof(ConnectClientCommand.ClientId)).Message);
+            .WithMessage($"The value cannot be empty: {nameof(ConnectClientCommand.ClientId)} ");
 
         RuleFor(x => x.TransientId)
             .NotEmpty()
-            .WithMessage(Errors.General.ValueIsEmpty(nameof(ConnectClientCommand.TransientId)).Message);
+            .WithMessage($"The value cannot be empty: {nameof(ConnectClientCommand.TransientId)} ");
     }
 }

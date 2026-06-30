@@ -25,7 +25,7 @@ public sealed class ConnectClientCommandHandler(
             if (client is null)
             {
                 logger.LogError("Clients with ID: {ID} not found in database. During ConnectClientCommand operation", command.ClientId);
-                return Result.Fail(Errors.General.Unauthorized());
+                return Result.Fail(Error.Unauthorized());
             }
 
             var existingClient = await clientCache.GetAsync(client.ConnectionId, cancellationToken);
@@ -36,7 +36,7 @@ public sealed class ConnectClientCommandHandler(
 
                 if (existingTransientId is not null)
                 {
-                    return Result.Fail(Errors.General.UnspecifiedError("Clients already exists with hub type"));
+                    return Result.Fail(Error.BadRequest("client.already.exists", "Client already exists with hub type"));
                 }
 
                 existingClient.AddTransientId(command.TransientId, command.HubType);
@@ -58,7 +58,7 @@ public sealed class ConnectClientCommandHandler(
         catch (Exception e)
         {
             logger.LogCritical("Exception occurred in ConnectCommandHandler: {Exception}. For Clients with ID: {ID}", e, command.ClientId);
-            return Result.Fail(Errors.General.UnspecifiedError("ConnectCommandHandler"));
+            return Result.Fail(Error.Failure("ConnectCommandHandler"));
         }
     }
 }
