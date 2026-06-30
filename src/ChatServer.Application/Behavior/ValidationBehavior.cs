@@ -1,5 +1,4 @@
 ﻿using ChatServer.Domain.Common;
-using ChatServer.Domain.ValueObjects;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
@@ -34,7 +33,7 @@ namespace ChatServer.Application.Behavior
         private static Error GenerateErrorMessage(ValidationResult validationResult)
         {
             var errorMessage = string.Join("; ", validationResult.Errors.Select(x => x.ErrorMessage));
-            return Errors.General.UnspecifiedError("Validation failed: " + errorMessage);
+            return Error.Validation("Validation failed: " + errorMessage);
         }
 
         private static TResponse CreateFailResponse(Error error)

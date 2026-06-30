@@ -1,4 +1,5 @@
 ﻿using ChatServer.Application.Abstractions;
+using ChatServer.Application.Cache.Client;
 using ChatServer.Application.Contracts.Cache;
 using ChatServer.Domain.Common;
 using Microsoft.Extensions.Logging;
@@ -19,7 +20,7 @@ public class DisconnectClientCommandHandler(
             if (client is null)
             {
                 logger.LogWarning("Clients with Transient ID: {ID} not found in cache", command.TransientId);
-                return Result.Fail(Errors.General.NotFound("Clients"));
+                return Result.Fail(Error.NotFound<ClientCacheDto>(command.TransientId));
             }
 
             await clientCache.RemoveAsync(client.ConnectionId, cancellationToken);
@@ -29,7 +30,7 @@ public class DisconnectClientCommandHandler(
         catch (Exception e)
         {
             logger.LogCritical("Exception occurred in DisconnectClientCommandHandler: {Exception}. For Clients with Transient ID: {ID}", e, command.TransientId);
-            return Result.Fail(Errors.General.UnspecifiedError("DisconnectClientCommandHandler"));
+            return Result.Fail(Error.Failure("DisconnectClientCommandHandler"));
         }
     }
 }
