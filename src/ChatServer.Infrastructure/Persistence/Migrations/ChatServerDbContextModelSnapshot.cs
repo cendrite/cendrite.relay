@@ -108,10 +108,12 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("ChatServer.Domain.Entities.Media", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("MediaId")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ClientId")
                         .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnName("client_id");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone")
@@ -121,21 +123,14 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted");
 
-                    b.Property<string>("MediaId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("SenderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sender_id");
-
                     b.Property<DateTime>("Updated")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated");
 
-                    b.HasKey("Id");
+                    b.HasKey("MediaId")
+                        .HasName("media_id");
 
-                    b.HasIndex("SenderId");
+                    b.HasIndex("ClientId");
 
                     b.ToTable("media", (string)null);
                 });
@@ -187,7 +182,7 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("ChatServer.Domain.Aggregates.Client", null)
                         .WithMany("Media")
-                        .HasForeignKey("SenderId")
+                        .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
