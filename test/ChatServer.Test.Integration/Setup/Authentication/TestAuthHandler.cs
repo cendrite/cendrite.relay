@@ -12,13 +12,27 @@ public class TestAuthHandler(
     UrlEncoder encoder)
     : AuthenticationHandler<AuthenticationSchemeOptions>(options, loggerFactory, encoder)
 {
+    /// <summary>
+    /// Header a test can set to control the authenticated tenant/client id.
+    /// The value is surfaced as the <see cref="ClaimTypes.NameIdentifier"/> claim,
+    /// which is what <c>ClaimsPrincipal.GetUserId()</c> reads.
+    /// </summary>
+    public const string TenantIdHeader = "X-Test-TenantId";
+
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var claims = new[]
+        var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, "test_user"),
-            new Claim(ClaimTypes.Role, "admin")
+            new(ClaimTypes.Name, "test_user"),
+            new(ClaimTypes.Role, "admin")
         };
+
+        if (Request.Headers.TryGetValue(TenantIdHeader, out var tenantId) &&
+            !string.IsNullOrWhiteSpace(tenantId))
+        {
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, tenantId.ToString()));
+        }
+
         var identity = new ClaimsIdentity(claims, "Test");
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, "Test");

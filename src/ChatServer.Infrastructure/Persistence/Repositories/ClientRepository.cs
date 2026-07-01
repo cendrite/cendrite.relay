@@ -1,3 +1,4 @@
+using ChatServer.Application.Abstractions;
 using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Domain.Aggregates;
 using ChatServer.Infrastructure.Persistence.Context;
@@ -5,16 +6,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatServer.Infrastructure.Persistence.Repositories;
 
-public class ClientRepository(ChatServerDbContext dbContext) : IClientRepository
+public class ClientRepository(ChatServerDbContext ctx) : IClientRepository
 {
+    public Task<Client?> GetAsync(ISpecification<Client> spec, CancellationToken ct = default)
+    {
+        var q = ctx.Client.Where(spec.Criteria);
+
+        q = spec.Includes.Aggregate(q, (current, include) => current.Include(include));
+
+        return q.FirstOrDefaultAsync(ct);
+    }
+
     public async Task CreateAsync(Client entity, CancellationToken ct = default)
     {
-        await dbContext.Client.AddAsync(entity, ct);
+        await ctx.Client.AddAsync(entity, ct);
     }
 
     public async Task<Client> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        return await dbContext.Client.FindAsync([id], cancellationToken: ct) 
+        return await ctx.Client.FindAsync([id], cancellationToken: ct)
             ?? throw new InvalidOperationException($"Client with ID {id} not found.");
     }
 
@@ -25,7 +35,7 @@ public class ClientRepository(ChatServerDbContext dbContext) : IClientRepository
 
     public Task QueryAsync(Guid id, Func<IQueryable<Client>, IQueryable<Client>>? includeFunc, CancellationToken ct = default)
     {
-        IQueryable<Client> query = dbContext.Set<Client>();
+        IQueryable<Client> query = ctx.Set<Client>();
 
         if (includeFunc is not null)
         {
@@ -37,13 +47,15 @@ public class ClientRepository(ChatServerDbContext dbContext) : IClientRepository
 
     public void Delete(Client entity)
     {
-        dbContext.Client.Remove(entity);
+        ctx.Client.Remove(entity);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
-        var entity = await dbContext.Client.FindAsync([id], cancellationToken: ct) 
+        var entity = await ctx.Client.FindAsync([id], cancellationToken: ct)
             ?? throw new InvalidOperationException($"Client with ID {id} not found.");
-        dbContext.Client.Remove(entity);
+        ctx.Client.Remove(entity);
     }
+
+
 }

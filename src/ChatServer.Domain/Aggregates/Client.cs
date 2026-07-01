@@ -7,7 +7,7 @@ using ChatServer.Domain.Entities;
 
 namespace ChatServer.Domain.Aggregates;
 
-public class Client : AggregateRoot 
+public class Client : AggregateRoot
 {
     /// <summary>
     /// ConnectionId is used send msg between clients and serves as a stable identifier for the SignalR connection.
@@ -40,6 +40,9 @@ public class Client : AggregateRoot
     {
         if (media is null)
             throw new ArgumentNullException(nameof(media));
+
+        if (_media.Any(m => m.MediaId == media.MediaId))
+            return;
 
         _media.Add(media);
     }
