@@ -1,8 +1,8 @@
 using ChatServer.Application.Abstractions;
 
-namespace ChatServer.Application.Features.Client.Commands.UploadMedia;
+namespace ChatServer.Application.Features.Media.Commands.Create;
 
-public sealed record UploadMediaCommand : ICommand
+public sealed record CreateMediaCommand : ICommand
 {
     public required Guid ClientId { get; init; }
     public required string MediaId { get; init; }
