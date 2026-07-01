@@ -10,7 +10,7 @@ internal sealed class MediaService(IBlobStore blobStore) : IMediaService
         Stream content,
         CancellationToken ct = default) => await blobStore.PutAsync(id, content, ct);
 
-    public Stream Open(string id) => blobStore.Open(id);
-
     public void Delete(string id) => blobStore.Delete(id);
+
+    public Stream Get(string id) => blobStore.Open(id);
 }

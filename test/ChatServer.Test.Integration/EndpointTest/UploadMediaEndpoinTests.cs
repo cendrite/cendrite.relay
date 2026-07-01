@@ -1,27 +1,78 @@
+using ChatServer.Application.Contracts.Services;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ChatServer.Test.Integration.EndpointTest;
 
-public class UploadMediaEndpointTests : IntegrationTestbase
+public class UploadMediaEndpointTests(IntegrationTestFactory<Program, ChatServerDbContext> factory) : IntegrationTestbase(factory)
 {
-    public UploadMediaEndpointTests(IntegrationTestFactory<Program, ChatServerDbContext> factory) : base(factory)
-    {
-    }
+    private readonly IMediaService _mediaService = factory.Services.CreateScope().ServiceProvider.GetRequiredService<IMediaService>();
 
     [Fact]
     public async Task UploadMedia_Should_StoreMediaInBlobStore_And_Return200Ok()
     {
         // Arrange
+        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        Db.Client.Add(testClient);
+        await Db.SaveChangesAsync();
+
         const string mediaId = "test-media-id";
         var content = new MemoryStream(System.Text.Encoding.UTF8.GetBytes("Test media content"));
 
+        var httpClient = CreateClient(testClient.Id.ToString());
+        
         // Act
-        var response = await Client.PostAsync($"/api/media/upload?id={mediaId}", new StreamContent(content));
+        var response = await httpClient.PostAsync($"/api/media/upload?id={mediaId}", new StreamContent(content));
 
         // Assert
         response.EnsureSuccessStatusCode();
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+
+        var client = await Db.Client.AsNoTracking().Include(c => c.Media)
+            .Where(c => c.Id == testClient.Id).FirstOrDefaultAsync();
+
+        client.Should().NotBeNull();
+        client!.Media.Should().ContainSingle(m => m.MediaId == mediaId && m.ClientId == testClient.Id);
+        var storedMediaStream = _mediaService.Get(mediaId);
+        storedMediaStream.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task UploadMedia_Should_Return404_WhenClientDoesNotExist()
+    {
+        // Arrange
+        var nonExistentClientId = Guid.NewGuid();
+        const string mediaId = "test-media-id";
+        var content = new MemoryStream(System.Text.Encoding.UTF8.GetBytes("Test media content"));
+
+        var httpClient = CreateClient(nonExistentClientId.ToString());
+
+        // Act
+        var response = await httpClient.PostAsync($"/api/media/upload?id={mediaId}", new StreamContent(content));
+
+        // Assert
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task UploadMedia_Shoudld_Return400_WhenMediaIdIsMissing()
+    {
+        // Arrange
+        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        Db.Client.Add(testClient);
+        await Db.SaveChangesAsync();
+
+        var content = new MemoryStream(System.Text.Encoding.UTF8.GetBytes("Test media content"));
+
+        var httpClient = CreateClient(testClient.Id.ToString());
+
+        // Act
+        var response = await httpClient.PostAsync($"/api/media/upload", new StreamContent(content));
+
+        // Assert
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
     }
 }
