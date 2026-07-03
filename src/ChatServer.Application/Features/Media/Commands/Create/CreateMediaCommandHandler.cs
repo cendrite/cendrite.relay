@@ -1,6 +1,6 @@
 using ChatServer.Application.Abstractions;
 using ChatServer.Application.Contracts.Repositories;
-using ChatServer.Application.Specifications;
+using ChatServer.Application.Specifications.Client;
 using ChatServer.Domain.Common;
 using Microsoft.Extensions.Logging;
 
@@ -22,7 +22,7 @@ public sealed class CreateMediaCommandHandler(
             return Result.Fail(Error.NotFound<Domain.Aggregates.Client>(cmd.ClientId.ToString()));
         }
 
-        var media = new Domain.Entities.Media(cmd.MediaId, cmd.ClientId);
+        var media = new Domain.Entities.Media(cmd.MediaId, cmd.ClientId, cmd.SenderId);
 
         client.AddMedia(media);
 

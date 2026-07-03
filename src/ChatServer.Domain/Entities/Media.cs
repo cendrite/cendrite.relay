@@ -8,18 +8,20 @@ public class Media : Entity
 {
     public string MediaId { get; private set; }
     public Guid ClientId { get; private set; }
+    public Guid SenderId { get; private set; }
     public MediaStatus Status { get; private set; } 
 
     public Media() { }
 
-    public Media(string mediaId, Guid clientId) : base(Guid.Empty)
+    public Media(string mediaId, Guid clientId, Guid senderId) : base(Guid.Empty)
     {
         MediaId = mediaId;
         ClientId = clientId;
+        SenderId = senderId;
         Status = MediaStatus.Pending;
     }
 
-    public void MarkAsSent() => Status = MediaStatus.Sent;
+    public void MarkAsSent() => Status = MediaStatus.Downloaded;
 
     public void MarkAsFailed() => Status = MediaStatus.Failed;
 }

@@ -13,7 +13,7 @@ public sealed class IngoingMessage
     public required Guid RecipientId { get; init; }
     public required int PayloadType { get; init; }
     public required string Payload { get; init; } 
-    public required Guid MessageToken { get; init; }
+    public Guid MessageToken { get; init; }
     public required DateTimeOffset Timestamp { get; init; }
 
     public ChatMessage MapToChatMessage()

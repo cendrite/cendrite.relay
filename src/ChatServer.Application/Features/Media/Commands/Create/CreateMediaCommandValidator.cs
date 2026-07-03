@@ -11,5 +11,8 @@ public sealed class CreateMediaCommandValidator : AbstractValidator<CreateMediaC
 
         RuleFor(x => x.MediaId)
             .NotEmpty();
+
+        RuleFor(x => x.SenderId)
+            .NotEmpty();
     }
 }
