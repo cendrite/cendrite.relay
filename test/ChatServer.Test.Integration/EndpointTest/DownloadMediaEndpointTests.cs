@@ -17,170 +17,84 @@ public class DownloadMediaEndpointTest : IntegrationTestbase
     }
 
     [Fact]
-    public async Task DownloadMedia_Should_ReturnFileStream_WhenMediaExists()
+    public async Task DownloadMedia_Should_ReturnFileStream_WhenBlobExists()
     {
         // Arrange
-        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
-        Db.Client.Add(testClient);
-        await Db.SaveChangesAsync();
-
         const string mediaId = "test-media-id";
-        await UploadTestMediaAsync(mediaId, testClient, testClient.ConnectionId);
+        await StoreBlobAsync(mediaId, "Test media content");
 
-        var httpClient = CreateClient(testClient.Id.ToString());
+        var httpClient = CreateClient(Guid.NewGuid().ToString());
 
         // Act
-        var response = await httpClient.GetAsync($"/api/media?id={mediaId}&senderId={testClient.ConnectionId}");
+        var response = await httpClient.GetAsync($"/api/media?id={mediaId}");
 
         // Assert
         response.EnsureSuccessStatusCode();
         response.Content.Headers.ContentType?.MediaType.Should().Be("application/octet-stream");
         var responseContent = await response.Content.ReadAsByteArrayAsync();
         responseContent.Should().BeEquivalentTo(System.Text.Encoding.UTF8.GetBytes("Test media content"));
-
-        var media = await Db.Client.AsNoTracking().Include(c => c.Media)
-            .Where(c => c.Id == testClient.Id).FirstOrDefaultAsync();
-
-        media.Should().NotBeNull();
-        media!.Media.Should().ContainSingle(m => m.MediaId == mediaId && m.ClientId == testClient.Id);
-        media.Media.First(m => m.MediaId == mediaId).Status.Should().Be(Domain.Enums.MediaStatus.Downloaded);
-        media.Media.First(m => m.MediaId == mediaId).SenderId.Should().Be(testClient.ConnectionId);
     }
 
     [Fact]
-    public async Task DownloadMedia_Should_Return500_WhenBlobIsMissing_ButMediaIsRegistered()
+    public async Task DownloadMedia_Should_Return500_WhenBlobDoesNotExist()
     {
         // Arrange
-        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
-        Db.Client.Add(testClient);
-        await Db.SaveChangesAsync();
+        var httpClient = CreateClient(Guid.NewGuid().ToString());
 
-        // Media is registered for the client, but the blob was never written to the store.
-        const string mediaId = "orphan-media-id";
-        testClient.AddMedia(new Domain.Entities.Media(mediaId, testClient.Id, testClient.ConnectionId));
-        await Db.SaveChangesAsync();
-
-        var httpClient = CreateClient(testClient.Id.ToString());
-
-        // Act - the status update succeeds, but opening the missing blob throws
-        var response = await httpClient.GetAsync($"/api/media?id={mediaId}&senderId={testClient.ConnectionId}");
+        // Act - this media id was never stored in the blob store
+        var response = await httpClient.GetAsync("/api/media?id=missing-media-id");
 
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.InternalServerError);
     }
 
     [Fact]
-    public async Task DownloadMedia_Should_MarkOnlyRequestedMedia_AsDownloaded_WhenClientHasMultipleMedia()
+    public async Task DownloadMedia_Should_ReturnCorrectFile_WhenMultipleBlobsExist()
     {
         // Arrange
-        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
-        Db.Client.Add(testClient);
-        await Db.SaveChangesAsync();
+        await StoreBlobAsync("media-one", "content-one");
+        await StoreBlobAsync("media-two", "content-two");
 
-        const string requestedMediaId = "media-one";
-        const string otherMediaId = "media-two";
-        await UploadTestMediaAsync(requestedMediaId, testClient, testClient.ConnectionId, "content-one");
-        await UploadTestMediaAsync(otherMediaId, testClient, testClient.ConnectionId, "content-two");
-
-        var httpClient = CreateClient(testClient.Id.ToString());
+        var httpClient = CreateClient(Guid.NewGuid().ToString());
 
         // Act
-        var response = await httpClient.GetAsync($"/api/media?id={requestedMediaId}&senderId={testClient.ConnectionId}");
+        var response = await httpClient.GetAsync("/api/media?id=media-one");
 
         // Assert
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsByteArrayAsync();
         responseContent.Should().BeEquivalentTo(System.Text.Encoding.UTF8.GetBytes("content-one"));
-
-        var client = await Db.Client.AsNoTracking().Include(c => c.Media)
-            .Where(c => c.Id == testClient.Id).FirstOrDefaultAsync();
-
-        client.Should().NotBeNull();
-        client!.Media.First(m => m.MediaId == requestedMediaId).Status.Should().Be(Domain.Enums.MediaStatus.Downloaded);
-        client.Media.First(m => m.MediaId == otherMediaId).Status.Should().Be(Domain.Enums.MediaStatus.Pending);
     }
 
     [Fact]
-    public async Task DownloadMedia_Should_RemainDownloaded_WhenRequestedMultipleTimes()
+    public async Task DownloadMedia_Should_NotChangeMediaStatus_BecauseGetIsAPureRead()
     {
-        // Arrange
+        // Arrange - a registered media in its default (Pending) state
         var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
         Db.Client.Add(testClient);
         await Db.SaveChangesAsync();
 
         const string mediaId = "test-media-id";
-        await UploadTestMediaAsync(mediaId, testClient, testClient.ConnectionId);
+        await StoreBlobAsync(mediaId, "Test media content");
+        testClient.AddMedia(new Domain.Entities.Media(mediaId, testClient.Id, testClient.ConnectionId));
+        await Db.SaveChangesAsync();
 
         var httpClient = CreateClient(testClient.Id.ToString());
 
-        // Act
-        var first = await httpClient.GetAsync($"/api/media?id={mediaId}&senderId={testClient.ConnectionId}");
-        var second = await httpClient.GetAsync($"/api/media?id={mediaId}&senderId={testClient.ConnectionId}");
+        // Act - downloading twice must not flip the status; only the ack endpoint may do that
+        await httpClient.GetAsync($"/api/media?id={mediaId}");
+        var response = await httpClient.GetAsync($"/api/media?id={mediaId}");
 
         // Assert
-        first.EnsureSuccessStatusCode();
-        second.EnsureSuccessStatusCode();
-        var responseContent = await second.Content.ReadAsByteArrayAsync();
-        responseContent.Should().BeEquivalentTo(System.Text.Encoding.UTF8.GetBytes("Test media content"));
-
-        var client = await Db.Client.AsNoTracking().Include(c => c.Media)
-            .Where(c => c.Id == testClient.Id).FirstOrDefaultAsync();
-        client!.Media.First(m => m.MediaId == mediaId).Status.Should().Be(Domain.Enums.MediaStatus.Downloaded);
-    }
-
-    [Fact]
-    public async Task DownloadMedia_Should_Return404_AndLeaveStatusPending_WhenSenderIdMatchesNoClient()
-    {
-        // Arrange
-        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
-        Db.Client.Add(testClient);
-        await Db.SaveChangesAsync();
-
-        const string mediaId = "test-media-id";
-        await UploadTestMediaAsync(mediaId, testClient, testClient.ConnectionId);
-
-        var httpClient = CreateClient(testClient.Id.ToString());
-        var unknownSenderId = Guid.NewGuid(); // matches no client's ConnectionId
-
-        // Act
-        var response = await httpClient.GetAsync($"/api/media?id={mediaId}&senderId={unknownSenderId}");
-
-        // Assert - no bytes are served and the status is left untouched
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
-
+        response.EnsureSuccessStatusCode();
         var client = await Db.Client.AsNoTracking().Include(c => c.Media)
             .Where(c => c.Id == testClient.Id).FirstOrDefaultAsync();
         client!.Media.First(m => m.MediaId == mediaId).Status.Should().Be(Domain.Enums.MediaStatus.Pending);
     }
 
-    [Fact]
-    public async Task DownloadMedia_Should_Return404_WhenMediaNotRegisteredForSender()
-    {
-        // Arrange
-        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
-        Db.Client.Add(testClient);
-        await Db.SaveChangesAsync();
-
-        var httpClient = CreateClient(testClient.Id.ToString());
-
-        // Act - client exists and senderId matches its ConnectionId, but no media with this id is registered
-        var response = await httpClient.GetAsync($"/api/media?id=unregistered-media-id&senderId={testClient.ConnectionId}");
-
-        // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
-    }
-
-    private async Task UploadTestMediaAsync(
-        string mediaId,
-        Domain.Aggregates.Client client,
-        Guid senderId,
-        string content = "Test media content")
+    private async Task StoreBlobAsync(string mediaId, string content)
     {
         var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(content));
         await _mediaService.StoreAsync(mediaId, stream, CancellationToken.None);
-
-        var media = new Domain.Entities.Media(mediaId, client.Id, senderId);
-        client.AddMedia(media);
-        await Db.SaveChangesAsync();
     }
 }

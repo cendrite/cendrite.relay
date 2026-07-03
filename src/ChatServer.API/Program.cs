@@ -5,6 +5,7 @@ using ChatServer.Application.Extensions;
 using ChatServer.Infrastructure.Extensions;
 using Scalar.AspNetCore;
 
+#pragma warning disable ASP0027 // Unnecessary public Program class declaration
 var builder = WebApplication.CreateBuilder(args);
 
 var env = builder.Environment;
@@ -87,6 +88,5 @@ catch (Exception ex)
     logger.LogCritical(ex, "Application terminated unexpectedly");
 }
 
-public partial class Program
-{
-}
+public partial class Program { }
+
