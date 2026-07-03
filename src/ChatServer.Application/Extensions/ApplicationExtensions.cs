@@ -16,5 +16,6 @@ public static class ApplicationExtensions
             cfg.RegisterServicesFromAssembly(assembly);
         });
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionBehavior<,>));
     }
 }

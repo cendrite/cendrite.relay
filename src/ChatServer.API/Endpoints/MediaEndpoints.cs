@@ -40,18 +40,12 @@ internal sealed class MediaEndpoints : IEndpoint
 
         group.MapGet("/", async (
                 [FromQuery] string id,
-                [FromQuery] Guid senderId,
                 IMediaService mediaSvc,
-                ISender sender,
                 ILogger<MediaEndpoints> logger,
                 CancellationToken ct) =>
         {
             try
             {
-                var result = await sender.Send(new UpdateMediaCommand { MediaId = id, SenderId = senderId }, ct);
-                if (!result.Success)
-                    return result.ToProblemDetails();
-
                 var stream = mediaSvc.Get(id);
                 return Results.File(stream, "application/octet-stream", enableRangeProcessing: true);
             }
@@ -60,6 +54,17 @@ internal sealed class MediaEndpoints : IEndpoint
                 logger.LogError(ex, "Failed to retrieve media with id {MediaId}", id);
                 return Results.Problem("Failed to retrieve media", statusCode: 500);
             }
+        });
+
+        group.MapPost("{id}/ack", async (
+                [FromRoute] string id,
+                [FromQuery] Guid senderId,
+                ISender sender,
+                ILogger<MediaEndpoints> logger,
+                CancellationToken ct) =>
+        {
+            var result = await sender.Send(new UpdateMediaCommand { MediaId = id, SenderId = senderId }, ct);
+            return result.Success ? Results.Ok() : result.ToProblemDetails();
         });
     }
 }
