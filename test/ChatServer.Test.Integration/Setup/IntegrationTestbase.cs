@@ -15,14 +15,14 @@ namespace ChatServer.Test.Integration.Setup;
 [Collection("ChatServerApplication")]
 public class IntegrationTestbase : IDisposable
 {
-    private readonly IntegrationTestFactory<Program, ChatServerDbContext> _factory;
+    protected readonly IntegrationTestFactory<Program, ChatServerDbContext> Factory;
     protected readonly ChatServerDbContext Db;
     protected readonly ITestHarness Harness;
     protected readonly IValkeyCacheService Cache;
 
     public IntegrationTestbase(IntegrationTestFactory<Program, ChatServerDbContext> factory)
     {
-        _factory = factory;
+        Factory = factory;
         Harness = factory.Services.GetTestHarness();
         var scope = factory.Services.CreateScope();
         Db = scope.ServiceProvider.GetRequiredService<ChatServerDbContext>();
@@ -41,7 +41,7 @@ public class IntegrationTestbase : IDisposable
 
     public HttpClient CreateClient(string tenantId)
     {
-        var client = _factory.CreateClient();
+        var client = Factory.CreateClient();
         client.DefaultRequestHeaders.Add(TestAuthHandler.TenantIdHeader, tenantId);
         return client;
     }

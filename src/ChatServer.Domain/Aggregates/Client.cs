@@ -54,4 +54,14 @@ public class Client : AggregateRoot
 
         _media.Remove(media);
     }
+
+    public Media? GetMedia(string mediaId)
+    {
+        if (string.IsNullOrWhiteSpace(mediaId))
+            throw new ArgumentException("MediaId cannot be null or whitespace.", nameof(mediaId));
+
+        var media = _media.FirstOrDefault(m => m.MediaId == mediaId);
+
+        return media;
+    }
 }
