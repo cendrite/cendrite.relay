@@ -8,14 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ChatServer.Test.Integration.EndpointTest;
 
-public class UploadMediaEndpointTests : IntegrationTestbase
+public class UploadMediaEndpointTests(
+    IntegrationTestFactory<Program, ChatServerDbContext> factory) 
+    : IntegrationTestbase(factory)
 {
-    private readonly IMediaService _mediaService;
-
-    public UploadMediaEndpointTests(IntegrationTestFactory<Program, ChatServerDbContext> factory) : base(factory)
-    {
-        _mediaService = factory.Services.CreateScope().ServiceProvider.GetRequiredService<IMediaService>();
-    }
+    private readonly IMediaService _mediaService = factory.Services.CreateScope().ServiceProvider.GetRequiredService<IMediaService>();
 
     [Fact]
     public async Task UploadMedia_Should_StoreMediaInBlobStore_And_Return200Ok()

@@ -7,14 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ChatServer.Test.Integration.EndpointTest;
 
-public class DownloadMediaEndpointTest : IntegrationTestbase
+public class DownloadMediaEndpointTest(
+    IntegrationTestFactory<Program, ChatServerDbContext> factory) 
+    : IntegrationTestbase(factory)
 {
-    private readonly IMediaService _mediaService;
-
-    public DownloadMediaEndpointTest(IntegrationTestFactory<Program, ChatServerDbContext> factory) : base(factory)
-    {
-        _mediaService = factory.Services.CreateScope().ServiceProvider.GetRequiredService<IMediaService>();
-    }
+    private readonly IMediaService _mediaService = factory.Services.CreateScope().ServiceProvider.GetRequiredService<IMediaService>();
 
     [Fact]
     public async Task DownloadMedia_Should_ReturnFileStream_WhenBlobExists()

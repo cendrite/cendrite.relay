@@ -5,12 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatServer.Test.Integration.EndpointTest;
 
-public class AckMediaEndpointTest : IntegrationTestbase
+public class AckMediaEndpointTest(
+    IntegrationTestFactory<Program, ChatServerDbContext> factory) 
+    : IntegrationTestbase(factory)
 {
-    public AckMediaEndpointTest(IntegrationTestFactory<Program, ChatServerDbContext> factory) : base(factory)
-    {
-    }
-
     [Fact]
     public async Task AckMedia_Should_MarkMediaAsDownloaded_AndReturn200()
     {
