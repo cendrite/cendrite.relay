@@ -19,6 +19,13 @@ public class TestAuthHandler(
     /// </summary>
     public const string TenantIdHeader = "X-Test-TenantId";
 
+    /// <summary>
+    /// Header a test can set to control the authenticated device id.
+    /// The value is surfaced as the <c>device_id</c> claim,
+    /// which is what <c>ClaimsPrincipal.GetDeviceId()</c> reads.
+    /// </summary>
+    public const string DeviceIdHeader = "X-Test-DeviceId";
+
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var claims = new List<Claim>
@@ -31,6 +38,12 @@ public class TestAuthHandler(
             !string.IsNullOrWhiteSpace(tenantId))
         {
             claims.Add(new Claim(ClaimTypes.NameIdentifier, tenantId.ToString()));
+        }
+
+        if (Request.Headers.TryGetValue(DeviceIdHeader, out var deviceId) &&
+            !string.IsNullOrWhiteSpace(deviceId))
+        {
+            claims.Add(new Claim("device_id", deviceId.ToString()));
         }
 
         var identity = new ClaimsIdentity(claims, "Test");

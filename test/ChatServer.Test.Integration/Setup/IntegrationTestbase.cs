@@ -39,10 +39,12 @@ public class IntegrationTestbase : IDisposable
         Harness.Stop();
     }
 
-    public HttpClient CreateClient(string tenantId)
+    public HttpClient CreateClient(string tenantId, string? deviceId = null)
     {
         var client = Factory.CreateClient();
         client.DefaultRequestHeaders.Add(TestAuthHandler.TenantIdHeader, tenantId);
+        if (deviceId is not null)
+            client.DefaultRequestHeaders.Add(TestAuthHandler.DeviceIdHeader, deviceId);
         return client;
     }
 }

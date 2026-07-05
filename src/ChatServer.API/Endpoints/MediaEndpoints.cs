@@ -27,7 +27,7 @@ internal sealed class MediaEndpoints : IEndpoint
             try
             {
                 await mediaSvc.StoreAsync(mediaId, httpreq.Body, ct);
-                var result = await sender.Send(new CreateMediaCommand { ClientId = ctx.User.GetUserId(), MediaId = mediaId, SenderId = senderId }, ct);
+                var result = await sender.Send(new CreateMediaCommand { ClientId = ctx.User.GetDeviceId(), MediaId = mediaId, SenderId = senderId }, ct);
 
                 return result.Success ? Results.Ok() : result.ToProblemDetails();
             }
