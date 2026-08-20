@@ -31,6 +31,11 @@ public class ClientModelConfiguration : BaseEntityTypeConfiguration<Client>
             .HasForeignKey(x => x.RecipientId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(x => x.Connections)
+            .WithOne()
+            .HasForeignKey(x => x.ClientId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasMany(x => x.Media)
             .WithOne()
             .HasForeignKey(x => x.ClientId)

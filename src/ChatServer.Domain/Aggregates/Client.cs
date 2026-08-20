@@ -43,9 +43,11 @@ public class Client : AggregateRoot
 
     public void AddConnection(Connection connection)
     {
-
         if (_connections.Any(c => c.TransientId == connection.TransientId))
             return;
+
+        if(_connections.Any(c=> c.Type == connection.Type))
+            RemoveConnection(_connections.First(c => c.Type == connection.Type));
 
         _connections.Add(connection);
     }
