@@ -144,6 +144,35 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                     b.ToTable("media", (string)null);
                 });
 
+            modelBuilder.Entity("Connection", b =>
+                {
+                    b.Property<string>("Type")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("TransientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("transient_id");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Type", "ClientId")
+                        .HasName("id");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("connection", (string)null);
+                });
+
             modelBuilder.Entity("Cypherly.Persistence.Outbox.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -196,9 +225,20 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Connection", b =>
+                {
+                    b.HasOne("ChatServer.Domain.Aggregates.Client", null)
+                        .WithMany("Connections")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ChatServer.Domain.Aggregates.Client", b =>
                 {
                     b.Navigation("ChatMessages");
+
+                    b.Navigation("Connections");
 
                     b.Navigation("Media");
                 });
