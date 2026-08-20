@@ -13,14 +13,15 @@ namespace ChatServer.Test.Integration.Client.CommandTest.Client;
 public class ConnectClientCommandHandlerTest : IntegrationTestbase
 {
     private readonly ConnectClientCommandHandler _sut;
+    private readonly IClientCache _clientCache;
     public ConnectClientCommandHandlerTest(IntegrationTestFactory<Program, ChatServerDbContext> factory) : base(factory)
     {
         var scope = factory.Services.CreateScope();
         var repo = scope.ServiceProvider.GetRequiredService<IClientRepository>();
         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        var clientCache = scope.ServiceProvider.GetRequiredService<IClientCache>();
+        _clientCache = scope.ServiceProvider.GetRequiredService<IClientCache>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ConnectClientCommandHandler>>();
-        _sut = new ConnectClientCommandHandler(repo, unitOfWork, clientCache, logger);
+        _sut = new ConnectClientCommandHandler(repo, unitOfWork, _clientCache, logger);
     }
 
     [Fact]
@@ -65,9 +66,11 @@ public class ConnectClientCommandHandlerTest : IntegrationTestbase
         Db.OutboxMessage.Should().HaveCount(1);
 
 
-        var cachedClient = Cache.GetAsync<Domain.Aggregates.Client>(client.ConnectionId.ToString(), null, CancellationToken.None);
+        var cachedClient = await _clientCache.GetAsync(client.ConnectionId, CancellationToken.None);
         cachedClient.Should().NotBeNull();
-        var inverseMapping = Cache.GetAsync<string>(command.TransientId, null, CancellationToken.None);
-        inverseMapping.Should().NotBeNull();
+        cachedClient!.GetTransientId(HubType.ChangeEvent).Should().Be(command.TransientId);
+
+        var inverseMapping = await Cache.GetAsync<Guid?>(command.TransientId, null, CancellationToken.None);
+        inverseMapping.Should().Be(client.ConnectionId);
     }
 }
