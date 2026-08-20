@@ -1,10 +1,6 @@
 using ChatServer.Domain.Abstractions;
 using ChatServer.Domain.Entities;
 
-// ReSharper disable ConvertToPrimaryConstructor
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
-// ReSharper disable FieldCanBeMadeReadOnly.Local
-
 namespace ChatServer.Domain.Aggregates;
 
 public class Client : AggregateRoot
@@ -22,10 +18,11 @@ public class Client : AggregateRoot
 
     private readonly List<Media> _media = [];
     private readonly List<ChatMessage> _chatMessages = [];
+    private readonly List<Connection> _connections = [];
 
     public IReadOnlyCollection<ChatMessage> ChatMessages => _chatMessages;
-
     public IReadOnlyCollection<Media> Media => _media;
+    public IReadOnlyCollection<Connection> Connections => _connections;
 
     private Client() : base(Guid.Empty) { } // For EF Core
 
@@ -38,22 +35,24 @@ public class Client : AggregateRoot
 
     public void AddMedia(Media media)
     {
-        if (media is null)
-            throw new ArgumentNullException(nameof(media));
-
         if (_media.Any(m => m.MediaId == media.MediaId))
             return;
 
         _media.Add(media);
     }
 
-    public void RemoveMedia(Media media)
+    public void AddConnection(Connection connection)
     {
-        if (media is null)
-            throw new ArgumentNullException(nameof(media));
 
-        _media.Remove(media);
+        if (_connections.Any(c => c.TransientId == connection.TransientId))
+            return;
+
+        _connections.Add(connection);
     }
+
+    public void RemoveConnection(Connection connection) => _connections.Remove(connection);
+
+    public void RemoveMedia(Media media) => _media.Remove(media);
 
     public Media? GetMedia(string mediaId)
     {
