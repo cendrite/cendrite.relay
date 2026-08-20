@@ -50,13 +50,13 @@ public sealed class SendMessageCommandHandler(
             logger.LogInformation("found recipient: {Recipient}", item.Recipient);
         }));
 
-        var actions = workItems.Select(item => item.Recipient is null
-            ? messageCache.CacheMessageAsync(item.ChatMessage, ct)
-            : messageSender.SendMessageAsync(item.Recipient.TransientIds[HubType.Message], item.OutgoingMessage, ct));
+        var actions = workItems.Select(item => item.Recipient?.GetTransientId(HubType.Message) is { } messageTransientId
+            ? messageSender.SendMessageAsync(messageTransientId, item.OutgoingMessage, ct)
+            : messageCache.CacheMessageAsync(item.ChatMessage, ct));
 
         await Task.WhenAll(actions);
 
-        return workItems.All(item => item.Recipient is not null)
+        return workItems.All(item => item.Recipient?.GetTransientId(HubType.Message) is not null)
             ? MessageReceipt.Delivered
             : MessageReceipt.Sent;
     }

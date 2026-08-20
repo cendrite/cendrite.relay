@@ -1,8 +1,6 @@
 using ChatServer.Application.Abstractions;
-using ChatServer.Application.Cache.Client;
 using ChatServer.Application.Contracts.Cache;
 using ChatServer.Application.Contracts.Repositories;
-using ChatServer.Application.Enums;
 using ChatServer.Domain.Common;
 using ChatServer.Domain.Events.Client;
 using Microsoft.Extensions.Logging;
@@ -28,27 +26,17 @@ public sealed class ConnectClientCommandHandler(
                 return Result.Fail(Error.Unauthorized());
             }
 
-            var existingClient = await clientCache.GetAsync(client.ConnectionId, cancellationToken);
+            var added = await clientCache.TryAddTransientIdAsync(client.ConnectionId, command.HubType, command.TransientId, cancellationToken);
 
-            if (existingClient is not null)
+            if (added is false)
             {
-                var existingTransientId = existingClient.GetTransientId(command.HubType);
-
-                if (existingTransientId is not null)
-                {
-                    return Result.Fail(Error.BadRequest("client.already.exists", "Client already exists with hub type"));
-                }
-
-                existingClient.AddTransientId(command.TransientId, command.HubType);
-                await clientCache.UpdateAsync(existingClient, cancellationToken);
+                return Result.Fail(Error.BadRequest("client.already.exists", "Client already exists with hub type"));
             }
-            else
+
+            var updatedClient = await clientCache.GetAsync(client.ConnectionId, cancellationToken);
+
+            if (updatedClient?.TransientIds.Count == 1)
             {
-                var newClient = new ClientCacheDto(client.ConnectionId, new Dictionary<HubType, string>
-                {
-                    { command.HubType, command.TransientId }
-                });
-                await clientCache.AddAsync(newClient, cancellationToken);
                 client.AddDomainEvent(new ClientConnectedEvent(client.Id));
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             }

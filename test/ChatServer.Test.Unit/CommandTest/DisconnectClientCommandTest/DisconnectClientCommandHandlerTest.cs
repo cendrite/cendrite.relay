@@ -28,14 +28,14 @@ public class DisconnectClientCommandHandlerTest
 
         A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).Returns<ClientCacheDto?>(null);
 
-        var command = new DisconnectClientCommand { TransientId = transientId };
+        var command = new DisconnectClientCommand { TransientId = transientId, HubType = HubType.ChangeEvent };
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
         A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _fakeCache.RemoveAsync(A<Guid>._, A<CancellationToken>._)).MustNotHaveHappened();
+        A.CallTo(() => _fakeCache.RemoveAsync(A<Guid>._, A<HubType>._, A<string>._, A<CancellationToken>._)).MustNotHaveHappened();
         result.Success.Should().BeFalse();
     }
 
@@ -53,14 +53,14 @@ public class DisconnectClientCommandHandlerTest
 
         A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).Returns(clientCacheDto);
 
-        var command = new DisconnectClientCommand { TransientId = transientId };
+        var command = new DisconnectClientCommand { TransientId = transientId, HubType = HubType.ChangeEvent };
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
         A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _fakeCache.RemoveAsync(clientCacheDto.ConnectionId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeCache.RemoveAsync(clientCacheDto.ConnectionId, HubType.ChangeEvent, transientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         result.Success.Should().BeTrue();
     }
 
@@ -77,16 +77,16 @@ public class DisconnectClientCommandHandlerTest
 
 
         A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).Returns(clientCacheDto);
-        A.CallTo(() => _fakeCache.RemoveAsync(A<Guid>._, A<CancellationToken>._)).Throws<Exception>();
+        A.CallTo(() => _fakeCache.RemoveAsync(A<Guid>._, A<HubType>._, A<string>._, A<CancellationToken>._)).Throws<Exception>();
 
-        var command = new DisconnectClientCommand { TransientId = transientId };
+        var command = new DisconnectClientCommand { TransientId = transientId, HubType = HubType.ChangeEvent };
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
         A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _fakeCache.RemoveAsync(clientCacheDto.ConnectionId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeCache.RemoveAsync(clientCacheDto.ConnectionId, HubType.ChangeEvent, transientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         result.Success.Should().BeFalse();
     }
 }

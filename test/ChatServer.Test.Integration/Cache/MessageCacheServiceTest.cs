@@ -1,6 +1,7 @@
 ﻿using ChatServer.Application.Contracts.Cache;
 using ChatServer.Domain.Entities;
 using ChatServer.Infrastructure.Caching;
+using ChatServer.Infrastructure.Interfaces;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup;
 using FluentAssertions;

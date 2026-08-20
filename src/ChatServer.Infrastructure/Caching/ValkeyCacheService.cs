@@ -1,30 +1,22 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
+﻿using System.Text.Json;
+using ChatServer.Infrastructure.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
 
 namespace ChatServer.Infrastructure.Caching;
 
-[SuppressMessage("Design", "CA1068:CancellationToken parameters must come last")]
-public interface IValkeyCacheService
-{
-    Task<T?> GetAsync<T>(string key, JsonSerializerOptions? options, CancellationToken cancellationToken);
-    Task SetAsync<T>(string key, T value, CancellationToken cancellationToken, bool shouldExipire = true, TimeSpan? expiry = null);
-    Task RemoveAsync(string key, CancellationToken cancellationToken);
-}
-
 internal class ValkeyCacheService(IDistributedCache cache, IConnectionMultiplexer connection) : IValkeyCacheService
 {
     public IDatabase Database => connection.GetDatabase();
 
-    public async Task<T?> GetAsync<T>(string key, JsonSerializerOptions? options, CancellationToken cancellationToken)
+    public async Task<T?> GetAsync<T>(string key, JsonSerializerOptions? options, CancellationToken ct)
     {
-        var serializedValue = await cache.GetStringAsync(key, cancellationToken);
+        var serializedValue = await cache.GetStringAsync(key, ct);
 
         return serializedValue == null ? default : JsonSerializer.Deserialize<T>(serializedValue, options ?? null);
     }
 
-    public async Task SetAsync<T>(string key, T value, CancellationToken cancellationToken, bool shouldExipire = true, TimeSpan? expiry = null)
+    public async Task SetAsync<T>(string key, T value, CancellationToken ct, bool shouldExipire = true, TimeSpan? expiry = null)
     {
         var options = new DistributedCacheEntryOptions();
 
@@ -35,11 +27,24 @@ internal class ValkeyCacheService(IDistributedCache cache, IConnectionMultiplexe
 
         var serializedValue = JsonSerializer.Serialize(value);
 
-        await cache.SetStringAsync(key, serializedValue, options, cancellationToken);
+        await cache.SetStringAsync(key, serializedValue, options, ct);
     }
 
-    public async Task RemoveAsync(string key, CancellationToken cancellationToken)
+    public async Task RemoveAsync(string key, CancellationToken ct)
+        => await cache.RemoveAsync(key, ct);
+
+    public async Task<bool> HashSetAsync(string key, string field, string value)
+        => await Database.HashSetAsync(key, field, value, When.NotExists);
+
+    public async Task<bool> HashDeleteAsync(string key, string field)
+        => await Database.HashDeleteAsync(key, field);
+
+    public async Task<long> HashLengthAsync(string key) 
+        => await Database.HashLengthAsync(key);
+
+    public async Task<Dictionary<string, string>> HashGetAllAsync(string key)
     {
-        await cache.RemoveAsync(key, cancellationToken);
+        var entries = await Database.HashGetAllAsync(key);
+        return entries.ToDictionary(entry => entry.Name.ToString(), entry => entry.Value.ToString());
     }
 }
