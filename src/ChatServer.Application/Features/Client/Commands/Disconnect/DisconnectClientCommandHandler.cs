@@ -23,7 +23,7 @@ public class DisconnectClientCommandHandler(
                 return Result.Fail(Error.NotFound<ClientCacheDto>(command.TransientId));
             }
 
-            await clientCache.RemoveAsync(client.ConnectionId, cancellationToken);
+            await clientCache.RemoveAsync(client.ConnectionId, command.HubType, command.TransientId, cancellationToken);
 
             return Result.Ok();
         }

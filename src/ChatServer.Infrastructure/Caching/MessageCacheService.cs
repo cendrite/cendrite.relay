@@ -1,5 +1,6 @@
 ﻿using ChatServer.Application.Contracts.Cache;
 using ChatServer.Domain.Entities;
+using ChatServer.Infrastructure.Interfaces;
 using StackExchange.Redis;
 
 namespace ChatServer.Infrastructure.Caching;

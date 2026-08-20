@@ -46,7 +46,7 @@ public class ConnectClientCommandHandlerTest
 
         // Assert
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _fakeCache.AddAsync(A<ClientCacheDto>._, A<CancellationToken>._)).MustNotHaveHappened();
+        A.CallTo(() => _fakeCache.TryAddTransientIdAsync(A<Guid>._, A<HubType>._, A<string>._, A<CancellationToken>._)).MustNotHaveHappened();
         A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustNotHaveHappened();
         result.Success.Should().BeFalse();
     }
@@ -59,8 +59,10 @@ public class ConnectClientCommandHandlerTest
         var client = new Client(Guid.NewGuid(), Guid.NewGuid());
 
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
+        A.CallTo(() => _fakeCache.TryAddTransientIdAsync(client.ConnectionId, HubType.ChangeEvent, "test", A<CancellationToken>._))
+            .Returns(true);
         A.CallTo(() => _fakeCache.GetAsync(client.ConnectionId, A<CancellationToken>._))
-            .Returns((ClientCacheDto?)null);
+            .Returns(new ClientCacheDto(client.ConnectionId, new Dictionary<HubType, string> { { HubType.ChangeEvent, "test" } }));
 
         var command = new ConnectClientCommand()
         {
@@ -74,9 +76,36 @@ public class ConnectClientCommandHandlerTest
 
         // Assert
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _fakeCache.AddAsync(A<ClientCacheDto>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeCache.TryAddTransientIdAsync(client.ConnectionId, HubType.ChangeEvent, "test", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         result.Success.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Handle_Duplicate_HubType_Should_Return_Result_Fail()
+    {
+        // Arrange
+        var clientId = Guid.NewGuid();
+        var client = new Client(Guid.NewGuid(), Guid.NewGuid());
+
+        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
+        A.CallTo(() => _fakeCache.TryAddTransientIdAsync(client.ConnectionId, HubType.ChangeEvent, "test", A<CancellationToken>._))
+            .Returns(false);
+
+        var command = new ConnectClientCommand()
+        {
+            ClientId = clientId,
+            TransientId = "test",
+            HubType = HubType.ChangeEvent
+        };
+
+        // Act
+        var result = await _sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        A.CallTo(() => _fakeCache.GetAsync(A<Guid>._, A<CancellationToken>._)).MustNotHaveHappened();
+        A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustNotHaveHappened();
+        result.Success.Should().BeFalse();
     }
 
     [Fact]
@@ -87,9 +116,7 @@ public class ConnectClientCommandHandlerTest
         var client = new Client(Guid.NewGuid(), Guid.NewGuid());
 
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
-        A.CallTo(() => _fakeCache.GetAsync(client.ConnectionId, A<CancellationToken>._))
-            .Returns((ClientCacheDto?)null);
-        A.CallTo(() => _fakeCache.AddAsync(A<ClientCacheDto>._, A<CancellationToken>._)).Throws<Exception>();
+        A.CallTo(() => _fakeCache.TryAddTransientIdAsync(A<Guid>._, A<HubType>._, A<string>._, A<CancellationToken>._)).Throws<Exception>();
 
         var command = new ConnectClientCommand()
         {
@@ -103,7 +130,7 @@ public class ConnectClientCommandHandlerTest
 
         // Assert
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _fakeCache.AddAsync(A<ClientCacheDto>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeCache.TryAddTransientIdAsync(A<Guid>._, A<HubType>._, A<string>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustNotHaveHappened();
         result.Success.Should().BeFalse();
     }

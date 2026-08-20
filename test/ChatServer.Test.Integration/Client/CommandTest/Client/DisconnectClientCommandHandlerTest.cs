@@ -13,13 +13,14 @@ namespace ChatServer.Test.Integration.Client.CommandTest.Client;
 public class DisconnectClientCommandHandlerTest : IntegrationTestbase
 {
     private readonly DisconnectClientCommandHandler _sut;
+    private readonly IClientCache _clientCache;
     public DisconnectClientCommandHandlerTest(IntegrationTestFactory<Program, ChatServerDbContext> factory) : base(factory)
     {
         var scope = factory.Services.CreateScope();
-        var cache = scope.ServiceProvider.GetRequiredService<IClientCache>();
+        _clientCache = scope.ServiceProvider.GetRequiredService<IClientCache>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<DisconnectClientCommandHandler>>();
 
-        _sut = new DisconnectClientCommandHandler(cache, logger);
+        _sut = new DisconnectClientCommandHandler(_clientCache, logger);
     }
 
     [Fact]
@@ -29,17 +30,12 @@ public class DisconnectClientCommandHandlerTest : IntegrationTestbase
         const string transientId = "TransientId";
         var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
 
-        var clientCacheDto = new ClientCacheDto(client.ConnectionId, new Dictionary<HubType, string>()
-        {
-            { HubType.ChangeEvent, transientId }
-        });
-
-        await Cache.SetAsync(client.ConnectionId.ToString(), clientCacheDto, CancellationToken.None);
-        await Cache.SetAsync(transientId, client.ConnectionId.ToString(), CancellationToken.None);
+        await _clientCache.TryAddTransientIdAsync(client.ConnectionId, HubType.ChangeEvent, transientId, CancellationToken.None);
 
         var command = new DisconnectClientCommand()
         {
             TransientId = transientId,
+            HubType = HubType.ChangeEvent
         };
 
         // Act
@@ -48,10 +44,10 @@ public class DisconnectClientCommandHandlerTest : IntegrationTestbase
         // Assert
         result.Success.Should().BeTrue();
 
-        var cacheClient = await Cache.GetAsync<Domain.Aggregates.Client>(client.ConnectionId.ToString(), null, CancellationToken.None);
+        var cacheClient = await _clientCache.GetAsync(client.ConnectionId, CancellationToken.None);
         cacheClient.Should().BeNull();
 
-        var inverseMapping = await Cache.GetAsync<string>(clientCacheDto.GetTransientId(HubType.ChangeEvent)!, null, CancellationToken.None);
+        var inverseMapping = await Cache.GetAsync<Guid?>(transientId, null, CancellationToken.None);
         inverseMapping.Should().BeNull();
     }
 
@@ -63,6 +59,7 @@ public class DisconnectClientCommandHandlerTest : IntegrationTestbase
         var command = new DisconnectClientCommand()
         {
             TransientId = transientId,
+            HubType = HubType.ChangeEvent
         };
 
         // Act

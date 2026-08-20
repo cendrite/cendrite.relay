@@ -42,7 +42,7 @@ public class BaseHub<T>(
     public async override Task OnDisconnectedAsync(Exception? exception)
     {
         logger.LogInformation("OnDisconnectedAsync triggered for connection: {ConnectionId}", Context.ConnectionId);
-        await sender.Send(new DisconnectClientCommand { TransientId = Context.ConnectionId });
+        await sender.Send(new DisconnectClientCommand { TransientId = Context.ConnectionId, HubType = GetHubType() });
         await base.OnDisconnectedAsync(exception);
     }
 

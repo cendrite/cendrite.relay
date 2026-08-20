@@ -1,4 +1,5 @@
 ﻿using ChatServer.Infrastructure.Caching;
+using ChatServer.Infrastructure.Interfaces;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup.Authentication;
 using MassTransit.Testing;

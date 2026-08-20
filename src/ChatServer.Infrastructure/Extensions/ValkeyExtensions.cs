@@ -1,6 +1,7 @@
 ﻿using ChatServer.Application.Contracts;
 using ChatServer.Application.Contracts.Cache;
 using ChatServer.Infrastructure.Caching;
+using ChatServer.Infrastructure.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
