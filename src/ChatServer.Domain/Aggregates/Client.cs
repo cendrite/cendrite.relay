@@ -54,6 +54,8 @@ public class Client : AggregateRoot
 
     public void RemoveConnection(string transientId) => _connections.RemoveAll(c => c.TransientId == transientId);
 
+    public Connection? GetConnection(string type) => _connections.FirstOrDefault(c => c.Type == type);
+
     public void RemoveMedia(Media media) => _media.Remove(media);
 
     public Media? GetMedia(string mediaId)
