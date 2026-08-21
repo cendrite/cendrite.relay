@@ -5,6 +5,7 @@ using ChatServer.Application.Features.Client.Commands.Connect;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -13,27 +14,23 @@ namespace ChatServer.Test.Integration.Client.CommandTest.Client;
 public class ConnectClientCommandHandlerTest : IntegrationTestbase
 {
     private readonly ConnectClientCommandHandler _sut;
-    private readonly IClientCache _clientCache;
     public ConnectClientCommandHandlerTest(IntegrationTestFactory<Program, ChatServerDbContext> factory) : base(factory)
     {
         var scope = factory.Services.CreateScope();
         var repo = scope.ServiceProvider.GetRequiredService<IClientRepository>();
         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        _clientCache = scope.ServiceProvider.GetRequiredService<IClientCache>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ConnectClientCommandHandler>>();
-        _sut = new ConnectClientCommandHandler(repo, unitOfWork, _clientCache, logger);
+        _sut = new ConnectClientCommandHandler(repo, unitOfWork, logger);
     }
 
     [Fact]
-    public async Task Handle_Invalid_ClientId_Should_Return_Result_Fail()
-    {
+    public async Task Handle_Invalid_ClientId_Should_Return_Result_Fail() {
         // Arrange
         var command = new ConnectClientCommand()
         {
             ClientId = Guid.NewGuid(),
             TransientId = "TransientId",
-            HubType = HubType.ChangeEvent
-        };
+            HubType = HubType.ChangeEvent };
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -66,11 +63,8 @@ public class ConnectClientCommandHandlerTest : IntegrationTestbase
         Db.OutboxMessage.Should().HaveCount(1);
 
 
-        var cachedClient = await _clientCache.GetAsync(client.ConnectionId, CancellationToken.None);
-        cachedClient.Should().NotBeNull();
-        cachedClient!.GetTransientId(HubType.ChangeEvent).Should().Be(command.TransientId);
-
-        var inverseMapping = await Cache.GetAsync<Guid?>(command.TransientId, null, CancellationToken.None);
-        inverseMapping.Should().Be(client.ConnectionId);
+        var updatedClient = await Db.Client.AsNoTracking().Include(c => c.Connections).FirstOrDefaultAsync(c=> c.Id  == client.Id);
+        updatedClient.Should().NotBeNull();
+        updatedClient!.Connections.FirstOrDefault(c=> c.ClientId  == client.Id).Should().NotBeNull();
     }
 }

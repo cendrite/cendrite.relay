@@ -33,8 +33,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\ChatServer.API\ChatServer.API.csproj" />
-      <ProjectReference Include="..\..\src\ChatServer.API\ChatServer.Domain.csproj" />
-      <ProjectReference Include="..\..\src\ChatServer.API\ChatServer.Application.csproj" />
+      <ProjectReference Include="..\..\src\ChatServer.Domain\ChatServer.Domain.csproj" />
+      <ProjectReference Include="..\..\src\ChatServer.Application\ChatServer.Application.csproj" />
       <ProjectReference Include="..\..\src\ChatServer.Infrastructure\ChatServer.Infrastructure.csproj" />
     </ItemGroup>
 
