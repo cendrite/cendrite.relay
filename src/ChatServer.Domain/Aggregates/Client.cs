@@ -5,9 +5,6 @@ namespace ChatServer.Domain.Aggregates;
 
 public class Client : AggregateRoot
 {
-    /// <summary>
-    /// ConnectionId is used send msg between clients and serves as a stable identifier for the SignalR connection.
-    /// </summary>
     public Guid ConnectionId { get; private set; }
 
     /// <summary>
