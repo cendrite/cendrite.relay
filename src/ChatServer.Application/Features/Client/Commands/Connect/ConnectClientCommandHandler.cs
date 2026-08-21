@@ -1,5 +1,4 @@
 using ChatServer.Application.Abstractions;
-using ChatServer.Application.Contracts.Cache;
 using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Domain.Common;
 using ChatServer.Domain.Events.Client;
@@ -10,42 +9,31 @@ namespace ChatServer.Application.Features.Client.Commands.Connect;
 public sealed class ConnectClientCommandHandler(
     IClientRepository clientRepository,
     IUnitOfWork unitOfWork,
-    IClientCache clientCache,
     ILogger<ConnectClientCommandHandler> logger)
     : ICommandHandler<ConnectClientCommand>
 {
-    public async Task<Result> Handle(ConnectClientCommand command, CancellationToken cancellationToken)
+    public async Task<Result> Handle(ConnectClientCommand cmd, CancellationToken ct)
     {
         try
         {
-            var client = await clientRepository.GetByIdAsync(command.ClientId);
+            var client = await clientRepository.GetByIdAsync(cmd.ClientId);
 
             if (client is null)
             {
-                logger.LogError("Clients with ID: {ID} not found in database. During ConnectClientCommand operation", command.ClientId);
+                logger.LogError("Clients with ID: {ID} not found in database", cmd.ClientId);
                 return Result.Fail(Error.Unauthorized());
             }
 
-            var added = await clientCache.TryAddTransientIdAsync(client.ConnectionId, command.HubType, command.TransientId, cancellationToken);
+            client.AddConnection(new Connection(cmd.TransientId, cmd.ClientId, cmd.HubType.ToString()));
+            client.AddDomainEvent(new ClientConnectedEvent(cmd.ClientId));
 
-            if (added is false)
-            {
-                return Result.Fail(Error.BadRequest("client.already.exists", "Client already exists with hub type"));
-            }
-
-            var updatedClient = await clientCache.GetAsync(client.ConnectionId, cancellationToken);
-
-            if (updatedClient?.TransientIds.Count == 1)
-            {
-                client.AddDomainEvent(new ClientConnectedEvent(client.Id));
-                await unitOfWork.SaveChangesAsync(cancellationToken);
-            }
+            await unitOfWork.SaveChangesAsync(ct);
 
             return Result.Ok();
         }
         catch (Exception e)
         {
-            logger.LogCritical("Exception occurred in ConnectCommandHandler: {Exception}. For Clients with ID: {ID}", e, command.ClientId);
+            logger.LogCritical("{Exception}. For Clients with ID: {ID}", e, cmd.ClientId);
             return Result.Fail(Error.Failure("ConnectCommandHandler"));
         }
     }

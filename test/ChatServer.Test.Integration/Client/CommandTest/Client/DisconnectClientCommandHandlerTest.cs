@@ -1,10 +1,12 @@
 ﻿using ChatServer.Application.Cache.Client;
 using ChatServer.Application.Contracts.Cache;
+using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Client.Commands.Disconnect;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -13,14 +15,14 @@ namespace ChatServer.Test.Integration.Client.CommandTest.Client;
 public class DisconnectClientCommandHandlerTest : IntegrationTestbase
 {
     private readonly DisconnectClientCommandHandler _sut;
-    private readonly IClientCache _clientCache;
     public DisconnectClientCommandHandlerTest(IntegrationTestFactory<Program, ChatServerDbContext> factory) : base(factory)
     {
         var scope = factory.Services.CreateScope();
-        _clientCache = scope.ServiceProvider.GetRequiredService<IClientCache>();
+        var repo = scope.ServiceProvider.GetRequiredService<IClientRepository>();
+        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<DisconnectClientCommandHandler>>();
 
-        _sut = new DisconnectClientCommandHandler(_clientCache, logger);
+        _sut = new DisconnectClientCommandHandler(repo, uow, logger);
     }
 
     [Fact]
@@ -29,8 +31,10 @@ public class DisconnectClientCommandHandlerTest : IntegrationTestbase
         // Arrange
         const string transientId = "TransientId";
         var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        client.AddConnection(new Connection(transientId, client.Id, nameof(HubType.ChangeEvent)));
 
-        await _clientCache.TryAddTransientIdAsync(client.ConnectionId, HubType.ChangeEvent, transientId, CancellationToken.None);
+        await Db.AddAsync(client);
+        await Db.SaveChangesAsync();
 
         var command = new DisconnectClientCommand()
         {
@@ -44,8 +48,9 @@ public class DisconnectClientCommandHandlerTest : IntegrationTestbase
         // Assert
         result.Success.Should().BeTrue();
 
-        var cacheClient = await _clientCache.GetAsync(client.ConnectionId, CancellationToken.None);
-        cacheClient.Should().BeNull();
+        var assertClient = await Db.Client.AsNoTracking().Include(c=> c.Connections).FirstOrDefaultAsync(c=> c.Id == client.Id);
+        assertClient.Should().NotBeNull();
+        assertClient!.Connections.Should().HaveCount(0);
 
         var inverseMapping = await Cache.GetAsync<Guid?>(transientId, null, CancellationToken.None);
         inverseMapping.Should().BeNull();

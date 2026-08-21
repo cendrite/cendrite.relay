@@ -47,12 +47,12 @@ public class Client : AggregateRoot
             return;
 
         if(_connections.Any(c=> c.Type == connection.Type))
-            RemoveConnection(_connections.First(c => c.Type == connection.Type));
+            RemoveConnection(connection.TransientId);
 
         _connections.Add(connection);
     }
 
-    public void RemoveConnection(Connection connection) => _connections.Remove(connection);
+    public void RemoveConnection(string transientId) => _connections.RemoveAll(c => c.TransientId == transientId);
 
     public void RemoveMedia(Media media) => _media.Remove(media);
 

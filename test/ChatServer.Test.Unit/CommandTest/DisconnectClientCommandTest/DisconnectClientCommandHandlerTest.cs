@@ -1,5 +1,5 @@
-﻿using ChatServer.Application.Cache.Client;
-using ChatServer.Application.Contracts.Cache;
+using ChatServer.Application.Abstractions;
+using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Client.Commands.Disconnect;
 using ChatServer.Domain.Aggregates;
@@ -11,22 +11,24 @@ namespace ChatServer.Test.Unit.CommandTest.DisconnectClientCommandTest;
 
 public class DisconnectClientCommandHandlerTest
 {
-    private readonly IClientCache _fakeCache;
+    private readonly IClientRepository _fakeRepository;
+    private readonly IUnitOfWork _fakeUow;
     private readonly DisconnectClientCommandHandler _sut;
 
     public DisconnectClientCommandHandlerTest()
     {
-        _fakeCache = A.Fake<IClientCache>();
-        _sut = new DisconnectClientCommandHandler(_fakeCache, A.Fake<ILogger<DisconnectClientCommandHandler>>());
+        _fakeRepository = A.Fake<IClientRepository>();
+        _fakeUow = A.Fake<IUnitOfWork>();
+        _sut = new DisconnectClientCommandHandler(_fakeRepository, _fakeUow, A.Fake<ILogger<DisconnectClientCommandHandler>>());
     }
 
     [Fact]
-    public async Task Handle_Client_Not_In_Cache_Should_Return_Result_Fail()
+    public async Task Handle_Client_Not_Found_Should_Return_Result_Fail()
     {
         // Arrange
         const string transientId = "test_transient_id";
 
-        A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).Returns<ClientCacheDto?>(null);
+        A.CallTo(() => _fakeRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._)).Returns((Client?)null);
 
         var command = new DisconnectClientCommand { TransientId = transientId, HubType = HubType.ChangeEvent };
 
@@ -34,24 +36,20 @@ public class DisconnectClientCommandHandlerTest
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _fakeCache.RemoveAsync(A<Guid>._, A<HubType>._, A<string>._, A<CancellationToken>._)).MustNotHaveHappened();
+        A.CallTo(() => _fakeRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustNotHaveHappened();
         result.Success.Should().BeFalse();
     }
 
     [Fact]
-    public async Task Handle_Client_In_Cache_Should_Return_Result_Ok()
+    public async Task Handle_Client_Found_Should_Return_Result_Ok()
     {
         // Arrange
         const string transientId = "test_transient_id";
         var client = new Client(Guid.NewGuid(), Guid.NewGuid());
-        var clientCacheDto = new ClientCacheDto(client.ConnectionId, new Dictionary<HubType, string>()
-        {
-            { HubType.ChangeEvent, transientId }
-        });
+        client.AddConnection(new Connection(transientId, client.Id, HubType.ChangeEvent.ToString()));
 
-
-        A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).Returns(clientCacheDto);
+        A.CallTo(() => _fakeRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._)).Returns(client);
 
         var command = new DisconnectClientCommand { TransientId = transientId, HubType = HubType.ChangeEvent };
 
@@ -59,8 +57,9 @@ public class DisconnectClientCommandHandlerTest
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _fakeCache.RemoveAsync(clientCacheDto.ConnectionId, HubType.ChangeEvent, transientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        client.Connections.Should().BeEmpty();
         result.Success.Should().BeTrue();
     }
 
@@ -70,14 +69,10 @@ public class DisconnectClientCommandHandlerTest
         // Arrange
         const string transientId = "test_transient_id";
         var client = new Client(Guid.NewGuid(), Guid.NewGuid());
-        var clientCacheDto = new ClientCacheDto(client.ConnectionId, new Dictionary<HubType, string>()
-        {
-            { HubType.ChangeEvent, transientId }
-        });
+        client.AddConnection(new Connection(transientId, client.Id, HubType.ChangeEvent.ToString()));
 
-
-        A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).Returns(clientCacheDto);
-        A.CallTo(() => _fakeCache.RemoveAsync(A<Guid>._, A<HubType>._, A<string>._, A<CancellationToken>._)).Throws<Exception>();
+        A.CallTo(() => _fakeRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._)).Returns(client);
+        A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).Throws<Exception>();
 
         var command = new DisconnectClientCommand { TransientId = transientId, HubType = HubType.ChangeEvent };
 
@@ -85,8 +80,8 @@ public class DisconnectClientCommandHandlerTest
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        A.CallTo(() => _fakeCache.GetByTransientIdAsync(transientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _fakeCache.RemoveAsync(clientCacheDto.ConnectionId, HubType.ChangeEvent, transientId, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         result.Success.Should().BeFalse();
     }
 }

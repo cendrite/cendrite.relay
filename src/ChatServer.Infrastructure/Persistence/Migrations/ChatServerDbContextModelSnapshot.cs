@@ -158,8 +158,9 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("TransientId")
-                        .HasColumnType("uuid")
+                    b.Property<string>("TransientId")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("transient_id");
 
                     b.Property<DateTime>("Updated")

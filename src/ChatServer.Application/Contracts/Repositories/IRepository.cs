@@ -3,7 +3,7 @@ using ChatServer.Domain.Abstractions;
 
 namespace ChatServer.Application.Contracts.Repositories;
 
-public interface IRepository<T> where T : AggregateRoot
+public interface IRepository<T> where T : Entity
 {
     Task<T?> GetAsync(ISpecification<T> spec, CancellationToken ct = default);
     Task CreateAsync(T entity, CancellationToken ct = default);
