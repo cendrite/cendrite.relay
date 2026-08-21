@@ -1,9 +1,10 @@
 ﻿using ChatServer.Application.Abstractions;
-using ChatServer.Application.Cache.Client;
 using ChatServer.Application.Contracts.Cache;
+using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Messaging.Models;
+using ChatServer.Application.Specifications.Client;
 using ChatServer.Domain.Common;
 using ChatServer.Domain.Entities;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace ChatServer.Application.Features.Messaging.Commands.Send;
 
 public sealed class SendMessageCommandHandler(
-    IClientCache clientCache,
+    IClientRepository clientRepo,
     IMessageCache messageCache,
     IMessageSender messageSender,
     ILogger<SendMessageCommandHandler> logger)
@@ -41,8 +42,8 @@ public sealed class SendMessageCommandHandler(
     {
         await Task.WhenAll(workItems.Select(async item =>
         {
-            item.Recipient = await clientCache.GetAsync(item.ChatMessage.RecipientId, ct);
-            if (item.Recipient?.GetTransientId(HubType.Message) is null)
+            item.Recipient = await clientRepo.GetAsync(new ClientWithConnectionSpec(item.ChatMessage.RecipientId), ct);
+            if (item.Recipient?.GetConnection(HubType.Message.ToString()) is null)
             {
                 logger.LogWarning("Recipient not found for message {MessageId}", item.ChatMessage.Id);
             }
@@ -50,13 +51,13 @@ public sealed class SendMessageCommandHandler(
             logger.LogInformation("found recipient: {Recipient}", item.Recipient);
         }));
 
-        var actions = workItems.Select(item => item.Recipient?.GetTransientId(HubType.Message) is { } messageTransientId
+        var actions = workItems.Select(item => item.Recipient?.GetConnection(HubType.Message.ToString())?.TransientId is { } messageTransientId
             ? messageSender.SendMessageAsync(messageTransientId, item.OutgoingMessage, ct)
             : messageCache.CacheMessageAsync(item.ChatMessage, ct));
 
         await Task.WhenAll(actions);
 
-        return workItems.All(item => item.Recipient?.GetTransientId(HubType.Message) is not null)
+        return workItems.All(item => item.Recipient?.GetConnection(HubType.Message.ToString())?.TransientId is not null)
             ? MessageReceipt.Delivered
             : MessageReceipt.Sent;
     }
@@ -65,7 +66,7 @@ public sealed class SendMessageCommandHandler(
     {
         public required OutgoingMessage OutgoingMessage { get; init; }
         public required ChatMessage ChatMessage { get; init; }
-        public ClientCacheDto? Recipient { get; set; }
+        public Domain.Aggregates.Client? Recipient { get; set; }
 
         public static WorkItem BuildItem(IngoingMessage message)
         {
