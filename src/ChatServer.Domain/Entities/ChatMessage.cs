@@ -8,13 +8,13 @@ public class ChatMessage : Entity
     public string ChatId { get; init; } 
     public Guid SenderId { get; init; }
     public Guid RecipientId { get; init; }
-    public Guid MessageToken { get; init; }
+    public string? MessageToken { get; init; }
     public string Content { get; init; } 
     public DateTime Timestamp { get; init; }
 
     public ChatMessage() { }
 
-    public ChatMessage(Guid id, Guid senderId, Guid recipientId, string chatId, Guid messageToken, string content) : base(id)
+    public ChatMessage(Guid id, Guid senderId, Guid recipientId, string chatId, string? messageToken, string content) : base(id)
     {
         SenderId = senderId;
         RecipientId = recipientId;
