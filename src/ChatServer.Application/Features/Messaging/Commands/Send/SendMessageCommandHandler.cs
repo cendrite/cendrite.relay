@@ -40,7 +40,7 @@ public sealed class SendMessageCommandHandler(
 
     private async Task<MessageReceipt> ProcessMessages(IReadOnlyCollection<WorkItem> workItems, CancellationToken ct)
     {
-        await Task.WhenAll(workItems.Select(async item =>
+        foreach (var item in workItems)
         {
             item.Recipient = await clientRepo.GetAsync(new ClientWithConnectionSpec(item.ChatMessage.RecipientId), ct);
             if (item.Recipient?.GetConnection(HubType.Message.ToString()) is null)
@@ -49,7 +49,7 @@ public sealed class SendMessageCommandHandler(
             }
 
             logger.LogInformation("found recipient: {Recipient}", item.Recipient);
-        }));
+        }
 
         var actions = workItems.Select(item => item.Recipient?.GetConnection(HubType.Message.ToString())?.TransientId is { } messageTransientId
             ? messageSender.SendMessageAsync(messageTransientId, item.OutgoingMessage, ct)
