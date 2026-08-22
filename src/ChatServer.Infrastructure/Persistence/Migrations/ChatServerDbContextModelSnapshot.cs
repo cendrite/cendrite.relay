@@ -79,8 +79,8 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted");
 
-                    b.Property<Guid>("MessageToken")
-                        .HasColumnType("uuid")
+                    b.Property<string>("MessageToken")
+                        .HasColumnType("text")
                         .HasColumnName("message_token");
 
                     b.Property<Guid>("RecipientId")
