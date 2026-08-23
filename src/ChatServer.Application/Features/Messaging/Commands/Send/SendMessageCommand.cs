@@ -3,7 +3,7 @@ using ChatServer.Application.Features.Messaging.Models;
 
 namespace ChatServer.Application.Features.Messaging.Commands.Send;
 
-public sealed record SendMessageCommand : ICommand<SendMessageCommandDto>
+public sealed record SendMessageCommand : ICommand<Receipt>
 {
     public required IReadOnlyCollection<IngoingMessage> Bundle { get; init; }
 }

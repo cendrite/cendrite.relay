@@ -14,9 +14,9 @@ public class MessageHub(
 {
     private readonly ISender _sender = sender;
 
-    public async Task<MessageReceipt> SendMessage(IReadOnlyCollection<IngoingMessage> ingoingMessage)
+    public async Task<Receipt> SendMessage(IReadOnlyCollection<IngoingMessage> ingoingMessage)
     {
         var result = await _sender.Send(new SendMessageCommand { Bundle = ingoingMessage });
-        return result.Value!.Receipt;
+        return result.Success ? result.Value : Receipt.Failed;
     }
 }

@@ -1,8 +1,7 @@
 ﻿namespace ChatServer.Application.Features.Messaging.Commands.Send;
 
-public enum MessageReceipt
+public enum Receipt
 {
     Sent = 1,
-    Delivered = 2,
     Failed = 3
 }
