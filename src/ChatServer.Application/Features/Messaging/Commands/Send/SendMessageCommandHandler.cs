@@ -16,29 +16,26 @@ public sealed class SendMessageCommandHandler(
     IMessageCache messageCache,
     IMessageSender messageSender,
     ILogger<SendMessageCommandHandler> logger)
-    : ICommandHandler<SendMessageCommand, SendMessageCommandDto>
+    : ICommandHandler<SendMessageCommand, Receipt>
 {
-    public async Task<Result<SendMessageCommandDto>> Handle(SendMessageCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Receipt>> Handle(SendMessageCommand request, CancellationToken cancellationToken)
     {
         try
         {
             var workItems = request.Bundle.Select(WorkItem.BuildItem).ToList();
 
-            logger.LogInformation("Processing {Count} incoming messages", workItems.Count);
-            logger.LogDebug("Messages: {Messages}", workItems.Select(wi => wi.ChatMessage));
-
             var receipt = await ProcessMessages(workItems, cancellationToken);
 
-            return Result.Ok(new SendMessageCommandDto { Receipt = receipt });
+            return Result.Ok(receipt);
         }
         catch (Exception ex)
         {
             logger.LogCritical(ex, "Exception occured while sending message");
-            return Result.Ok(new SendMessageCommandDto { Receipt = MessageReceipt.Failed });
+            return Result.Ok(Receipt.Failed);
         }
     }
 
-    private async Task<MessageReceipt> ProcessMessages(IReadOnlyCollection<WorkItem> workItems, CancellationToken ct)
+    private async Task<Receipt> ProcessMessages(IReadOnlyCollection<WorkItem> workItems, CancellationToken ct)
     {
         foreach (var item in workItems)
         {
@@ -57,9 +54,7 @@ public sealed class SendMessageCommandHandler(
 
         await Task.WhenAll(actions);
 
-        return workItems.All(item => item.Recipient?.GetConnection(HubType.Message.ToString())?.TransientId is not null)
-            ? MessageReceipt.Delivered
-            : MessageReceipt.Sent;
+        return Receipt.Sent;
     }
 
     sealed internal class WorkItem
