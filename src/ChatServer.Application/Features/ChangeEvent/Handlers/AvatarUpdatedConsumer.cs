@@ -1,8 +1,9 @@
-﻿using ChatServer.Application.Contracts.Cache;
+﻿using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Base;
 using ChatServer.Application.Features.ChangeEvent.Event;
+using ChatServer.Application.Specifications.Client;
 using Cypherly.Message.Contracts.Messages.Profile;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,7 @@ namespace ChatServer.Application.Features.ChangeEvent.Handlers;
 
 public class AvatarUpdatedConsumer(
     IChangeEventNotifier changeEventNotifier,
-    IClientCache clientCache,
+    IClientRepository clientRepository,
     ILogger<AvatarUpdatedConsumer> logger)
     : IConsumer<AvatarUpdatedMessage>
 {
@@ -26,14 +27,12 @@ public class AvatarUpdatedConsumer(
 
             foreach (var connectionId in message.ConnectionIds)
             {
-                var client = await clientCache.GetAsync(connectionId, context.CancellationToken);
-                if (client?.GetTransientId(HubType.ChangeEvent) is null)
-                {
-                    logger.LogWarning("Clients not found for connectionId {ConnectionId}", connectionId);
-                    continue;
-                }
+                var client = await clientRepository.GetAsync(new ClientWithConnectionSpec(connectionId), context.CancellationToken);
+                var connection = client?.GetConnection(HubType.ChangeEvent.ToString());
 
-                await changeEventNotifier.NotifyAsync(client.TransientIds[HubType.ChangeEvent], changeEvent, context.CancellationToken);
+                if (connection is null) continue;
+
+                await changeEventNotifier.NotifyAsync(connection.TransientId, changeEvent, context.CancellationToken);
             }
         }
         catch (Exception ex)
