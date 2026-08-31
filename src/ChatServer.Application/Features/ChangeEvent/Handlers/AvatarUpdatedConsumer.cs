@@ -1,8 +1,9 @@
-﻿using ChatServer.Application.Contracts.Cache;
+﻿using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Base;
 using ChatServer.Application.Features.ChangeEvent.Event;
+using ChatServer.Application.Specifications.Client;
 using Cypherly.Message.Contracts.Messages.Profile;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -11,34 +12,31 @@ namespace ChatServer.Application.Features.ChangeEvent.Handlers;
 
 public class AvatarUpdatedConsumer(
     IChangeEventNotifier changeEventNotifier,
-    IClientCache clientCache,
+    IClientRepository clientRepository,
     ILogger<AvatarUpdatedConsumer> logger)
     : IConsumer<AvatarUpdatedMessage>
 {
-    public async Task Consume(ConsumeContext<AvatarUpdatedMessage> context)
+    public async Task Consume(ConsumeContext<AvatarUpdatedMessage> ctx)
     {
         try
         {
-            logger.LogInformation("received AvatarUpdatedMessage: {@Message}", context.Message);
-            var message = context.Message;
+            var message = ctx.Message;
             var eventData = new AvatarUpdatedEvent(message.UserTag, message.AvatarKey);
             var changeEvent = new Base.ChangeEvent(Guid.NewGuid(), ChangeEventType.AvatarChanged, "UserProfile", "Profile picture updated", eventData);
 
             foreach (var connectionId in message.ConnectionIds)
             {
-                var client = await clientCache.GetAsync(connectionId, context.CancellationToken);
-                if (client?.GetTransientId(HubType.ChangeEvent) is null)
-                {
-                    logger.LogWarning("Clients not found for connectionId {ConnectionId}", connectionId);
-                    continue;
-                }
+                var client = await clientRepository.GetAsync(new ClientWithConnectionSpec(connectionId), ctx.CancellationToken);
+                var connection = client?.GetConnection(HubType.ChangeEvent.ToString());
 
-                await changeEventNotifier.NotifyAsync(client.TransientIds[HubType.ChangeEvent], changeEvent, context.CancellationToken);
+                if (connection is null) continue;
+
+                await changeEventNotifier.NotifyAsync(connection.TransientId, changeEvent, ctx.CancellationToken);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error processing AvatarUpdatedMessage: {@Message}", context.Message);
+            logger.LogError(ex, "Error processing AvatarUpdatedMessage: {@Message}", ctx.Message);
             throw;
         }
     }

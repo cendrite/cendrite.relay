@@ -1,5 +1,4 @@
 ﻿using ChatServer.Application.Abstractions;
-using ChatServer.Application.Cache.Client;
 using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Specifications.Client;
 using ChatServer.Domain.Common;
@@ -22,7 +21,7 @@ public class DisconnectClientCommandHandler(
             if (client is null)
             {
                 logger.LogWarning("Clients with Transient ID: {ID} not found in cache", cmd.TransientId);
-                return Result.Fail(Error.NotFound<ClientCacheDto>(cmd.TransientId));
+                return Result.Fail(Error.NotFound<Domain.Aggregates.Client>(cmd.TransientId));
             }
 
             client.RemoveConnection(cmd.TransientId);

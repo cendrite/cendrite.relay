@@ -1,8 +1,9 @@
-﻿using ChatServer.Application.Contracts.Cache;
+﻿using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Base;
 using ChatServer.Application.Features.ChangeEvent.Event;
+using ChatServer.Application.Specifications.Client;
 using Cypherly.Message.Contracts.Messages.Friendship;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace ChatServer.Application.Features.ChangeEvent.Handlers;
 
 public class FriendshipAcceptedConsumer(
-    IClientCache clientCache,
+    IClientRepository clientRepository,
     IChangeEventNotifier notifier,
     ILogger<FriendshipAcceptedConsumer> logger)
     : IConsumer<FriendshipAcceptedMessage>
@@ -21,12 +22,14 @@ public class FriendshipAcceptedConsumer(
         {
             var message = context.Message;
 
-            foreach (var connection in message.RouteIds)
+            foreach (var connectionId in message.RouteIds)
             {
-                var client = await clientCache.GetAsync(connection);
-                if (client?.GetTransientId(HubType.ChangeEvent) is null)
+                var client = await clientRepository.GetAsync(new ClientWithConnectionSpec(connectionId), context.CancellationToken);
+                var connection = client?.GetConnection(HubType.ChangeEvent.ToString());
+
+                if (connection is null)
                 {
-                    logger.LogWarning("Clients not found for connection ID: {ConnectionId}", connection);
+                    logger.LogWarning("Clients not found for connection ID: {ConnectionId}", connectionId);
                     continue;
                 }
 
@@ -46,7 +49,7 @@ public class FriendshipAcceptedConsumer(
                     "Friendship accepted",
                     friendAccepted);
 
-                await notifier.NotifyAsync(client.TransientIds[HubType.ChangeEvent], changeEvent);
+                await notifier.NotifyAsync(connection.TransientId, changeEvent, context.CancellationToken);
             }
         }
         catch (Exception ex)

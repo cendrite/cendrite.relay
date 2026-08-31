@@ -1,5 +1,4 @@
-﻿using ChatServer.Application.Contracts.Cache;
-using ChatServer.Application.Contracts.Repositories;
+﻿using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Client.Commands.Connect;
 using ChatServer.Infrastructure.Persistence.Context;

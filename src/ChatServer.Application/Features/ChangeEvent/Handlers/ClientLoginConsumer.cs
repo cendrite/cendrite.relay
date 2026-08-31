@@ -1,9 +1,9 @@
-using ChatServer.Application.Contracts.Cache;
 using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Base;
 using ChatServer.Application.Features.ChangeEvent.Event;
+using ChatServer.Application.Specifications.Client;
 using Cypherly.Message.Contracts.Messages.Device;
 using Cypherly.Message.Contracts.Messages.User;
 using Cypherly.Message.Contracts.Responses.Device;
@@ -14,7 +14,6 @@ namespace ChatServer.Application.Features.ChangeEvent.Handlers
 {
     public sealed class ClientLoginConsumer(
         IChangeEventNotifier notifier,
-        IClientCache clientCache,
         IClientRepository clientRepository,
         IUnitOfWork unitOfWork,
         IRequestClient<ConnectionIdsProxyMessage> connectionIdsClient,
@@ -29,11 +28,12 @@ namespace ChatServer.Application.Features.ChangeEvent.Handlers
 
                 foreach (var connectionId in proxyResult.Item2)
                 {
-                    var client = await clientCache.GetAsync(connectionId);
+                    var client = await clientRepository.GetAsync(new ClientWithConnectionSpec(connectionId), context.CancellationToken);
+                    var connection = client?.GetConnection(HubType.ChangeEvent.ToString());
 
-                    if (client?.GetTransientId(HubType.ChangeEvent) is not null and var id)
+                    if (connection is not null)
                     {
-                        await notifier.NotifyAsync(id, new Base.ChangeEvent(
+                        await notifier.NotifyAsync(connection.TransientId, new Base.ChangeEvent(
                             Guid.NewGuid(),
                             ChangeEventType.UserLoggedIn,
                             "UserLogin",

@@ -1,10 +1,11 @@
-﻿using AutoFixture;
-using ChatServer.Application.Cache.Client;
-using ChatServer.Application.Contracts.Cache;
+using AutoFixture;
+using ChatServer.Application.Abstractions;
+using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Handlers;
 using ChatServer.Domain.Aggregates;
+using ChatServer.Domain.Entities;
 using Cypherly.Message.Contracts.Messages.Profile;
 using FakeItEasy;
 using MassTransit;
@@ -16,17 +17,17 @@ public class AvatarUpdatedConsumerTest
 {
     private readonly Fixture _fixture = new();
     private readonly IChangeEventNotifier _fakeChangeEventNotifier;
-    private readonly IClientCache _fakeClientCache;
+    private readonly IClientRepository _fakeClientRepository;
 
     private readonly AvatarUpdatedConsumer _sut;
 
     public AvatarUpdatedConsumerTest()
     {
         _fakeChangeEventNotifier = A.Fake<IChangeEventNotifier>();
-        _fakeClientCache = A.Fake<IClientCache>();
+        _fakeClientRepository = A.Fake<IClientRepository>();
         var fakeLogger = A.Fake<ILogger<AvatarUpdatedConsumer>>();
 
-        _sut = new AvatarUpdatedConsumer(_fakeChangeEventNotifier, _fakeClientCache, fakeLogger);
+        _sut = new AvatarUpdatedConsumer(_fakeChangeEventNotifier, _fakeClientRepository, fakeLogger);
     }
 
     [Fact]
@@ -34,15 +35,13 @@ public class AvatarUpdatedConsumerTest
     {
         // Arrange
         var client = new Client(Guid.NewGuid(), Guid.NewGuid());
+        client.AddConnection(new Connection("transientId", client.Id, HubType.ChangeEvent.ToString()));
+
         var profilePictureUpdatedMessage = _fixture.Build<AvatarUpdatedMessage>()
             .With(c => c.ConnectionIds, [client.ConnectionId]).Create();
 
-        var clientCacheDto = new ClientCacheDto(client.ConnectionId, new Dictionary<HubType, string>()
-        {
-            { HubType.ChangeEvent, "transientId" }
-        });
-
-        A.CallTo(() => _fakeClientCache.GetAsync(client.ConnectionId, CancellationToken.None)).Returns(clientCacheDto);
+        A.CallTo(() => _fakeClientRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._))
+            .Returns(client);
 
         var fakeConsumeContext = A.Fake<ConsumeContext<AvatarUpdatedMessage>>();
         A.CallTo(() => fakeConsumeContext.Message).Returns(profilePictureUpdatedMessage);
@@ -51,7 +50,7 @@ public class AvatarUpdatedConsumerTest
         await _sut.Consume(fakeConsumeContext);
 
         // Assert
-        A.CallTo(() => _fakeChangeEventNotifier.NotifyAsync(clientCacheDto.GetTransientId(HubType.ChangeEvent)!,
+        A.CallTo(() => _fakeChangeEventNotifier.NotifyAsync("transientId",
                 A<Application.Features.ChangeEvent.Base.ChangeEvent>._,
                 A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
@@ -63,6 +62,9 @@ public class AvatarUpdatedConsumerTest
         var profilePictureUpdatedMessage = _fixture.Create<AvatarUpdatedMessage>();
         var fakeConsumeContext = A.Fake<ConsumeContext<AvatarUpdatedMessage>>();
         A.CallTo(() => fakeConsumeContext.Message).Returns(profilePictureUpdatedMessage);
+
+        A.CallTo(() => _fakeClientRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._))
+            .Returns((Client?)null);
 
         await _sut.Consume(fakeConsumeContext);
 

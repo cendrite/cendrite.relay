@@ -1,6 +1,4 @@
-﻿using ChatServer.Application.Cache.Client;
-using ChatServer.Application.Contracts.Cache;
-using ChatServer.Application.Contracts.Repositories;
+﻿using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Client.Commands.Disconnect;
 using ChatServer.Infrastructure.Persistence.Context;
@@ -26,7 +24,7 @@ public class DisconnectClientCommandHandlerTest : IntegrationTestbase
     }
 
     [Fact]
-    public async Task Handle_WhenClientExists_ShouldRemoveClientFromCache()
+    public async Task Handle_WhenClientExists_ShouldRemoveConnection()
     {
         // Arrange
         const string transientId = "TransientId";
@@ -51,9 +49,6 @@ public class DisconnectClientCommandHandlerTest : IntegrationTestbase
         var assertClient = await Db.Client.AsNoTracking().Include(c=> c.Connections).FirstOrDefaultAsync(c=> c.Id == client.Id);
         assertClient.Should().NotBeNull();
         assertClient!.Connections.Should().HaveCount(0);
-
-        var inverseMapping = await Cache.GetAsync<Guid?>(transientId, null, CancellationToken.None);
-        inverseMapping.Should().BeNull();
     }
 
     [Fact]
