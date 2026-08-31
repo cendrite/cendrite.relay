@@ -1,11 +1,11 @@
 using AutoFixture;
-using ChatServer.Application.Cache.Client;
-using ChatServer.Application.Contracts.Cache;
+using ChatServer.Application.Abstractions;
 using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Handlers;
 using ChatServer.Domain.Aggregates;
+using ChatServer.Domain.Entities;
 using Cypherly.Message.Contracts.Messages.Device;
 using Cypherly.Message.Contracts.Messages.User;
 using Cypherly.Message.Contracts.Responses.Device;
@@ -19,7 +19,6 @@ public sealed class ClientLogoutConsumerTest
 {
     private readonly Fixture _fixture = new();
     private readonly IChangeEventNotifier _fakeChangeEventNotifier;
-    private readonly IClientCache _fakeClientCache;
     private readonly IRequestClient<ConnectionIdsProxyMessage> _fakeConnectionIdsClient;
     private readonly IClientRepository _fakeClientRepository;
     private readonly IUnitOfWork _fakeUnitOfWork;
@@ -29,18 +28,16 @@ public sealed class ClientLogoutConsumerTest
     public ClientLogoutConsumerTest()
     {
         _fakeChangeEventNotifier = A.Fake<IChangeEventNotifier>();
-        _fakeClientCache = A.Fake<IClientCache>();
         _fakeConnectionIdsClient = A.Fake<IRequestClient<ConnectionIdsProxyMessage>>();
         _fakeClientRepository = A.Fake<IClientRepository>();
         _fakeUnitOfWork = A.Fake<IUnitOfWork>();
         var fakeLogger = A.Fake<ILogger<ClientLogoutConsumer>>();
 
         _sut = new ClientLogoutConsumer(
-                _fakeChangeEventNotifier, 
-                _fakeClientCache, 
+                _fakeChangeEventNotifier,
                 _fakeClientRepository,
                 _fakeUnitOfWork,
-                _fakeConnectionIdsClient, 
+                _fakeConnectionIdsClient,
                 fakeLogger);
     }
 
@@ -70,12 +67,10 @@ public sealed class ClientLogoutConsumerTest
         A.CallTo(() => _fakeConnectionIdsClient.GetResponse<ConnectionIdsProxyResponse>(A<ConnectionIdsProxyMessage>._, A<CancellationToken>._, A<RequestTimeout>._))
             .Returns(Task.FromResult(responseMessage));
 
-        var clientCacheDto = new ClientCacheDto(client.ConnectionId, new Dictionary<HubType, string>()
-        {
-            { HubType.ChangeEvent, "transientId" }
-        });
+        client.AddConnection(new Connection("transientId", client.Id, HubType.ChangeEvent.ToString()));
 
-        A.CallTo(() => _fakeClientCache.GetAsync(client.ConnectionId, CancellationToken.None)).Returns(clientCacheDto);
+        A.CallTo(() => _fakeClientRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._))
+            .Returns(client);
 
         var fakeConsumeContext = A.Fake<ConsumeContext<UserLogoutMessage>>();
         A.CallTo(() => fakeConsumeContext.Message).Returns(userLogoutMessage);
@@ -84,7 +79,7 @@ public sealed class ClientLogoutConsumerTest
         await _sut.Consume(fakeConsumeContext);
 
         // Assert
-        A.CallTo(() => _fakeChangeEventNotifier.NotifyAsync(clientCacheDto.GetTransientId(HubType.ChangeEvent)!,
+        A.CallTo(() => _fakeChangeEventNotifier.NotifyAsync("transientId",
                 A<Application.Features.ChangeEvent.Base.ChangeEvent>._,
                 A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();

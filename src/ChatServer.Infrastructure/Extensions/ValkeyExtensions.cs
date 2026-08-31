@@ -30,7 +30,6 @@ internal static class ValkeyExtensions
     private static void AddCacheServices(this IServiceCollection services)
     {
         services.AddSingleton<IValkeyCacheService, ValkeyCacheService>();
-        services.AddScoped<IClientCache, ClientCache>();
         services.AddScoped<IMessageCache, MessageCacheService>();
     }
 }
