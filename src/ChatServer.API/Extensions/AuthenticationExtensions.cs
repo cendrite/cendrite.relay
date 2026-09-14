@@ -23,6 +23,10 @@ public static class AuthenticationExtensions
             options.RequireHttpsMetadata = false;
             options.Authority = authority;
             options.Audience = audience;
+
+            options.AutomaticRefreshInterval = TimeSpan.FromMinutes(5);
+            options.RefreshInterval = TimeSpan.FromMinutes(1);
+            options.RefreshOnIssuerKeyNotFound = true;
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
