@@ -45,6 +45,31 @@ public class UploadMediaEndpointTests(
         storedMediaStream.Should().NotBeNull();
     }
 
+    [Theory]
+    [InlineData("../../../../tmp/evil")]
+    [InlineData("..%2f..%2f..%2ftmp%2fevil")]
+    [InlineData("/tmp/evil")]
+    [InlineData("ab/../../evil")]
+    public async Task UploadMedia_Should_Return400_WhenMediaIdContainsPathTraversal(string maliciousId)
+    {
+        // Arrange
+        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        Db.Client.Add(testClient);
+        await Db.SaveChangesAsync();
+
+        var content = new MemoryStream(System.Text.Encoding.UTF8.GetBytes("malicious content"));
+        var httpClient = CreateClient(testClient.Id.ToString(), testClient.Id.ToString());
+
+        // Act
+        var response = await httpClient.PostAsync($"/api/media/upload?mediaId={maliciousId}&senderId={Guid.NewGuid()}", new StreamContent(content));
+
+        // Assert
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        var client = await Db.Client.AsNoTracking().Include(c => c.Media)
+            .Where(c => c.Id == testClient.Id).FirstOrDefaultAsync();
+        client!.Media.Should().BeEmpty();
+    }
+
     [Fact]
     public async Task UploadMedia_Should_Return404_WhenClientDoesNotExist()
     {

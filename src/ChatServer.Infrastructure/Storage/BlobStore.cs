@@ -52,6 +52,21 @@ internal sealed class BlobStore(IOptions<BlobStoreSettings> options) : IBlobStor
 
     private string GeneratePath(string id)
     {
-        return Path.Combine(options.Value.Root, id[..2], id.Substring(2, 2), id);
+        if (string.IsNullOrEmpty(id) || id.Length < 4)
+        {
+            throw new UnauthorizedAccessException($"Invalid media id '{id}'.");
+        }
+
+        var root = Path.GetFullPath(options.Value.Root);
+        var rootWithSeparator = root.EndsWith(Path.DirectorySeparatorChar) ? root : root + Path.DirectorySeparatorChar;
+
+        var path = Path.GetFullPath(Path.Combine(root, id[..2], id.Substring(2, 2), id));
+
+        if (!path.StartsWith(rootWithSeparator, StringComparison.Ordinal))
+        {
+            throw new UnauthorizedAccessException($"Resolved media path escapes the blob store root for id '{id}'.");
+        }
+
+        return path;
     }
 }

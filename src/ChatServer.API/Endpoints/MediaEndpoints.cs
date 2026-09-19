@@ -24,6 +24,11 @@ internal sealed class MediaEndpoints : IEndpoint
                 HttpContext ctx,
                 CancellationToken ct) =>
         {
+            if (!MediaIdValidator.IsValid(mediaId))
+            {
+                return Results.Problem("Invalid media id", statusCode: 400);
+            }
+
             try
             {
                 await mediaSvc.StoreAsync(mediaId, httpreq.Body, ct);
@@ -44,6 +49,11 @@ internal sealed class MediaEndpoints : IEndpoint
                 ILogger<MediaEndpoints> logger,
                 CancellationToken ct) =>
         {
+            if (!MediaIdValidator.IsValid(id))
+            {
+                return Results.Problem("Invalid media id", statusCode: 400);
+            }
+
             try
             {
                 var stream = mediaSvc.Get(id);
