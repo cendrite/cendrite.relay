@@ -22,7 +22,14 @@ public sealed class SendMessageCommandHandler(
     {
         try
         {
-            var workItems = request.Bundle.Select(m => WorkItem.BuildItem(m, request.SenderId)).ToList();
+            var sender = await clientRepo.GetByIdAsync(request.SenderDeviceId, cancellationToken);
+            if (sender is null)
+            {
+                logger.LogWarning("Sender client not found for device {DeviceId}", request.SenderDeviceId);
+                return Result.Ok(Receipt.Failed);
+            }
+
+            var workItems = request.Bundle.Select(m => WorkItem.BuildItem(m, sender.ConnectionId)).ToList();
 
             var receipt = await ProcessMessages(workItems, cancellationToken);
 
