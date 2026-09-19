@@ -32,6 +32,23 @@ public class DownloadMediaEndpointTest(
         responseContent.Should().BeEquivalentTo(System.Text.Encoding.UTF8.GetBytes("Test media content"));
     }
 
+    [Theory]
+    [InlineData("../../../../etc/passwd")]
+    [InlineData("..%2f..%2f..%2fetc%2fpasswd")]
+    [InlineData("/etc/passwd")]
+    [InlineData("ab/../../secret")]
+    public async Task DownloadMedia_Should_Return400_WhenIdContainsPathTraversal(string maliciousId)
+    {
+        // Arrange
+        var httpClient = CreateClient(Guid.NewGuid().ToString());
+
+        // Act
+        var response = await httpClient.GetAsync($"/api/media?id={maliciousId}");
+
+        // Assert
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+    }
+
     [Fact]
     public async Task DownloadMedia_Should_Return500_WhenBlobDoesNotExist()
     {
