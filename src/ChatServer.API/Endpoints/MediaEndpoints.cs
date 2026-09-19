@@ -16,7 +16,6 @@ internal sealed class MediaEndpoints : IEndpoint
 
         group.MapPost("/upload", async (
                 [FromQuery] string mediaId,
-                [FromQuery] Guid senderId,
                 HttpRequest httpreq,
                 IMediaService mediaSvc,
                 ISender sender,
@@ -32,7 +31,7 @@ internal sealed class MediaEndpoints : IEndpoint
             try
             {
                 await mediaSvc.StoreAsync(mediaId, httpreq.Body, ct);
-                var result = await sender.Send(new CreateMediaCommand { ClientId = ctx.User.GetDeviceId(), MediaId = mediaId, SenderId = senderId }, ct);
+                var result = await sender.Send(new CreateMediaCommand { ClientId = ctx.User.GetDeviceId(), MediaId = mediaId }, ct);
 
                 return result.Success ? Results.Ok() : result.ToProblemDetails();
             }
@@ -68,12 +67,11 @@ internal sealed class MediaEndpoints : IEndpoint
 
         group.MapPost("{id}/ack", async (
                 [FromRoute] string id,
-                [FromQuery] Guid senderId,
                 ISender sender,
                 ILogger<MediaEndpoints> logger,
                 CancellationToken ct) =>
         {
-            var result = await sender.Send(new UpdateMediaCommand { MediaId = id, SenderId = senderId }, ct);
+            var result = await sender.Send(new UpdateMediaCommand { MediaId = id }, ct);
             return result.Success ? Results.Ok() : result.ToProblemDetails();
         });
     }

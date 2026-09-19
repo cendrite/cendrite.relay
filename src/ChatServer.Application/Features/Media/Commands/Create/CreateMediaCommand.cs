@@ -6,5 +6,4 @@ public sealed record CreateMediaCommand : ICommand
 {
     public required Guid ClientId { get; init; }
     public required string MediaId { get; init; }
-    public required Guid SenderId { get; init; }
 }

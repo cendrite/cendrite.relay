@@ -57,7 +57,7 @@ public class BaseHub<T>(
         throw new InvalidOperationException($"Unsupported hub type for {typeof(T).Name}");
     }
 
-    private Guid GetDeviceId()
+    protected Guid GetDeviceId()
     {
         var ctx = Context.GetHttpContext() ?? throw new InvalidOperationException("HTTP Context is null.");
         return ctx.User.GetDeviceId();
