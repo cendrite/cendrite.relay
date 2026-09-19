@@ -14,11 +14,11 @@ public sealed class UpdateMediaCommandHandler(
 {
     public async Task<Result> Handle(UpdateMediaCommand cmd, CancellationToken ct)
     {
-        var client = await clRepo.GetAsync(new ClientByConnectionIdWithMediaSepc(cmd.SenderId), ct);
+        var client = await clRepo.GetAsync(new ClientWithMediaByMediaIdSpec(cmd.MediaId), ct);
         if (client is null)
         {
-            logger.LogWarning("Client with connection id {ConnectionId} not found", cmd.SenderId);
-            return Result.Fail(Error.NotFound<Domain.Aggregates.Client>(cmd.SenderId.ToString()));
+            logger.LogWarning("Media with id {MediaId} not found", cmd.MediaId);
+            return Result.Fail(Error.NotFound<Domain.Entities.Media>(cmd.MediaId));
         }
 
         var media = client.GetMedia(cmd.MediaId);

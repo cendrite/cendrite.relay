@@ -22,7 +22,7 @@ public sealed class SendMessageCommandHandler(
     {
         try
         {
-            var workItems = request.Bundle.Select(WorkItem.BuildItem).ToList();
+            var workItems = request.Bundle.Select(m => WorkItem.BuildItem(m, request.SenderId)).ToList();
 
             var receipt = await ProcessMessages(workItems, cancellationToken);
 
@@ -63,12 +63,12 @@ public sealed class SendMessageCommandHandler(
         public required ChatMessage ChatMessage { get; init; }
         public Domain.Aggregates.Client? Recipient { get; set; }
 
-        public static WorkItem BuildItem(IngoingMessage message)
+        public static WorkItem BuildItem(IngoingMessage message, Guid senderId)
         {
             return new WorkItem
             {
-                OutgoingMessage = message.MapToOutgoingMessage(),
-                ChatMessage = message.MapToChatMessage()
+                OutgoingMessage = message.MapToOutgoingMessage(senderId),
+                ChatMessage = message.MapToChatMessage(senderId)
             };
         }
     }

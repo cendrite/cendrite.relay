@@ -23,7 +23,7 @@ public class AckMediaEndpointTest(
         var httpClient = CreateClient(testClient.Id.ToString());
 
         // Act
-        var response = await httpClient.PostAsync($"/api/media/{mediaId}/ack?senderId={testClient.ConnectionId}", null);
+        var response = await httpClient.PostAsync($"/api/media/{mediaId}/ack", null);
 
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
@@ -34,7 +34,7 @@ public class AckMediaEndpointTest(
     }
 
     [Fact]
-    public async Task AckMedia_Should_Return404_AndLeaveStatusPending_WhenSenderIdMatchesNoClient()
+    public async Task AckMedia_Should_IgnoreClientSuppliedSenderId_AndStillAckByMediaIdAlone()
     {
         // Arrange
         var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
@@ -45,21 +45,21 @@ public class AckMediaEndpointTest(
         await RegisterMediaAsync(mediaId, testClient, testClient.ConnectionId);
 
         var httpClient = CreateClient(testClient.Id.ToString());
-        var unknownSenderId = Guid.NewGuid(); // matches no client's ConnectionId
+        var spoofedSenderId = Guid.NewGuid(); // attacker-controlled value, must never be trusted
 
-        // Act
-        var response = await httpClient.PostAsync($"/api/media/{mediaId}/ack?senderId={unknownSenderId}", null);
+        // Act - a stale/spoofed senderId query param must not affect the outcome
+        var response = await httpClient.PostAsync($"/api/media/{mediaId}/ack?senderId={spoofedSenderId}", null);
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
 
         var client = await Db.Client.AsNoTracking().Include(c => c.Media)
             .Where(c => c.Id == testClient.Id).FirstOrDefaultAsync();
-        client!.Media.First(m => m.MediaId == mediaId).Status.Should().Be(Domain.Enums.MediaStatus.Pending);
+        client!.Media.First(m => m.MediaId == mediaId).Status.Should().Be(Domain.Enums.MediaStatus.Downloaded);
     }
 
     [Fact]
-    public async Task AckMedia_Should_Return404_WhenMediaNotRegisteredForSender()
+    public async Task AckMedia_Should_Return404_WhenMediaIsNotRegistered()
     {
         // Arrange
         var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
@@ -68,8 +68,8 @@ public class AckMediaEndpointTest(
 
         var httpClient = CreateClient(testClient.Id.ToString());
 
-        // Act - client exists and senderId matches its ConnectionId, but no media with this id is registered
-        var response = await httpClient.PostAsync($"/api/media/unregistered-media-id/ack?senderId={testClient.ConnectionId}", null);
+        // Act - no media with this id is registered anywhere
+        var response = await httpClient.PostAsync("/api/media/unregistered-media-id/ack", null);
 
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
@@ -89,8 +89,8 @@ public class AckMediaEndpointTest(
         var httpClient = CreateClient(testClient.Id.ToString());
 
         // Act
-        var first = await httpClient.PostAsync($"/api/media/{mediaId}/ack?senderId={testClient.ConnectionId}", null);
-        var second = await httpClient.PostAsync($"/api/media/{mediaId}/ack?senderId={testClient.ConnectionId}", null);
+        var first = await httpClient.PostAsync($"/api/media/{mediaId}/ack", null);
+        var second = await httpClient.PostAsync($"/api/media/{mediaId}/ack", null);
 
         // Assert
         first.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
