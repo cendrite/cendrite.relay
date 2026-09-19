@@ -16,7 +16,7 @@ public sealed class IngoingMessage
 
     /// <summary>
     /// SenderId is intentionally not a property on this model - it must be derived from the
-    /// authenticated connection (see SendMessageCommand.SenderId), never trusted from the client payload.
+    /// authenticated connection (see SendMessageCommand.SenderDeviceId), never trusted from the client payload.
     /// </summary>
     public ChatMessage MapToChatMessage(Guid senderId)
     {
