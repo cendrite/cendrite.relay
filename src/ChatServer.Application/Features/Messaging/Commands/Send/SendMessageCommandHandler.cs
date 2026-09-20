@@ -1,5 +1,4 @@
 ﻿using ChatServer.Application.Abstractions;
-using ChatServer.Application.Contracts.Cache;
 using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
@@ -13,7 +12,6 @@ namespace ChatServer.Application.Features.Messaging.Commands.Send;
 
 public sealed class SendMessageCommandHandler(
     IClientRepository clientRepo,
-    IMessageCache messageCache,
     IMessageSender messageSender,
     IUnitOfWork unitOfWork,
     ILogger<SendMessageCommandHandler> logger)
@@ -53,14 +51,14 @@ public sealed class SendMessageCommandHandler(
 
         var actions = workItems.Select(item => item.Recipient?.GetConnection(HubType.Message.ToString())?.TransientId is { } messageTransientId
             ? messageSender.SendMessageAsync(messageTransientId, item.OutgoingMessage, ct)
-            : CacheMessages(item, ct));
+            : CacheMessages(item));
 
         await Task.WhenAll(actions);
 
         return Receipt.Sent;
     }
 
-    private async Task CacheMessages(WorkItem item, CancellationToken ct)
+    private async Task CacheMessages(WorkItem item)
     {
         if(item.Recipient is null)
         {
@@ -68,7 +66,6 @@ public sealed class SendMessageCommandHandler(
             return;
         }
 
-        await messageCache.CacheMessageAsync(item.ChatMessage, ct);
         item.Recipient?.AddChatMessage(item.ChatMessage);
     }
 
