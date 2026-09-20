@@ -64,4 +64,12 @@ public class Client : AggregateRoot
 
         return media;
     }
+
+    public void AddChatMessage(ChatMessage message)
+    {
+        if (_chatMessages.Any(m => m.Id == message.Id))
+            return;
+
+        _chatMessages.Add(message);
+    }
 }
