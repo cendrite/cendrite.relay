@@ -14,6 +14,7 @@ public class ChatMessageModelConfiguration : BaseEntityTypeConfiguration<ChatMes
         
         builder.Property(x => x.Id)
             .HasColumnName("id")
+            .ValueGeneratedNever()
             .IsRequired();
 
         builder.Property(x => x.SenderId)
