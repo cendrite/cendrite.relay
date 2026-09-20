@@ -1,4 +1,5 @@
 using ChatServer.Application.Abstractions;
+using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Domain.Entities;
 using ChatServer.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -29,11 +30,25 @@ internal sealed class MessageRepository(ChatServerDbContext ctx) : IMessageRepos
         return await q.FirstOrDefaultAsync(ct);
     }
 
-    public async Task<IReadOnlyCollection<ChatMessage>> GetBatchMessagesAsync(Guid recipientId, int batchCount, CancellationToken ct = default)
+    public async Task<IReadOnlyCollection<ChatMessage>> GetBatchMessagesAsync(
+        Guid recipientId,
+        int batchCount,
+        MessageCursor? after = null,
+        CancellationToken ct = default)
     {
-        return await ctx.ChatMessage
-            .Where(x => x.RecipientId == recipientId)
-            .OrderByDescending(x => x.Timestamp)
+        var query = ctx.ChatMessage.Where(x => x.RecipientId == recipientId);
+
+        if (after is { } cursor)
+        {
+            var timestamp = cursor.Timestamp;
+            var id = cursor.Id;
+
+            query = query.Where(x => x.Timestamp > timestamp || (x.Timestamp == timestamp && x.Id > id));
+        }
+
+        return await query
+            .OrderBy(x => x.Timestamp)
+            .ThenBy(x => x.Id)
             .Take(batchCount)
             .ToListAsync(ct);
     }

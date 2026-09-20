@@ -2,6 +2,7 @@ using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Client.Commands.Connect;
 using ChatServer.Domain.Aggregates;
+using ChatServer.Domain.Events.Client;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -121,5 +122,56 @@ public class ConnectClientCommandHandlerTest
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         result.Success.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Handle_Message_HubType_Should_Raise_VacuumMessagesEvent()
+    {
+        // Arrange
+        var clientId = Guid.NewGuid();
+        var connectionId = Guid.NewGuid();
+        var client = new Client(clientId, connectionId);
+
+        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
+
+        var command = new ConnectClientCommand()
+        {
+            ClientId = clientId,
+            TransientId = "test",
+            HubType = HubType.Message
+        };
+
+        // Act
+        var result = await _sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Success.Should().BeTrue();
+        client.DomainEvents.OfType<VacuumMessagesEvent>().Should().ContainSingle()
+            .Which.ConnectionId.Should().Be(connectionId);
+    }
+
+    [Fact]
+    public async Task Handle_ChangeEvent_HubType_Should_Not_Raise_VacuumMessagesEvent()
+    {
+        // Arrange
+        var clientId = Guid.NewGuid();
+        var client = new Client(clientId, Guid.NewGuid());
+
+        A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
+
+        var command = new ConnectClientCommand()
+        {
+            ClientId = clientId,
+            TransientId = "test",
+            HubType = HubType.ChangeEvent
+        };
+
+        // Act
+        var result = await _sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Success.Should().BeTrue();
+        client.DomainEvents.OfType<VacuumMessagesEvent>().Should().BeEmpty();
+        client.DomainEvents.OfType<ClientConnectedEvent>().Should().ContainSingle();
     }
 }
