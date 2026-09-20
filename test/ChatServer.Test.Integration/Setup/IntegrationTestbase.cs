@@ -1,5 +1,4 @@
-﻿using ChatServer.Infrastructure.Interfaces;
-using ChatServer.Infrastructure.Persistence.Context;
+﻿using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup.Authentication;
 using MassTransit.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +17,6 @@ public class IntegrationTestbase : IDisposable
     protected readonly IntegrationTestFactory<Program, ChatServerDbContext> Factory;
     protected readonly ChatServerDbContext Db;
     protected readonly ITestHarness Harness;
-    protected readonly IValkeyCacheService Cache;
 
     public IntegrationTestbase(IntegrationTestFactory<Program, ChatServerDbContext> factory)
     {
@@ -26,7 +24,6 @@ public class IntegrationTestbase : IDisposable
         Harness = factory.Services.GetTestHarness();
         var scope = factory.Services.CreateScope();
         Db = scope.ServiceProvider.GetRequiredService<ChatServerDbContext>();
-        Cache = scope.ServiceProvider.GetRequiredService<IValkeyCacheService>();
         Db.Database.EnsureCreated();
         Harness.Start();
     }
