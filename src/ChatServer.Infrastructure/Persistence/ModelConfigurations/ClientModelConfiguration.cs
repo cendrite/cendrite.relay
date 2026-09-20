@@ -28,6 +28,7 @@ public class ClientModelConfiguration : BaseEntityTypeConfiguration<Client>
 
         builder.HasMany(x => x.ChatMessages)
             .WithOne()
+            .HasPrincipalKey(x => x.ConnectionId)
             .HasForeignKey(x => x.RecipientId)
             .OnDelete(DeleteBehavior.Cascade);
 

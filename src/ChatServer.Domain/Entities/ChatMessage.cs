@@ -14,12 +14,13 @@ public class ChatMessage : Entity
 
     public ChatMessage() { }
 
-    public ChatMessage(Guid id, Guid senderId, Guid recipientId, string chatId, string? messageToken, string content) : base(id)
+    public ChatMessage(Guid id, Guid senderId, Guid recipientId, string chatId, string? messageToken, string content, DateTime timestamp) : base(id)
     {
         SenderId = senderId;
         RecipientId = recipientId;
         ChatId = chatId;
         MessageToken = messageToken;
         Content = content;
+        Timestamp = timestamp.ToUniversalTime();
     }
 }

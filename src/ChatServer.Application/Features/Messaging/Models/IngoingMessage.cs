@@ -14,10 +14,6 @@ public sealed class IngoingMessage
     public string? MessageToken { get; init; }
     public required DateTimeOffset Timestamp { get; init; }
 
-    /// <summary>
-    /// SenderId is intentionally not a property on this model - it must be derived from the
-    /// authenticated connection (see SendMessageCommand.SenderDeviceId), never trusted from the client payload.
-    /// </summary>
     public ChatMessage MapToChatMessage(Guid senderId)
     {
         return new ChatMessage(
@@ -26,7 +22,8 @@ public sealed class IngoingMessage
             recipientId: RecipientId,
             chatId: ChatId,
             messageToken: MessageToken,
-            content: Payload);
+            content: Payload,
+            timestamp: Timestamp.UtcDateTime);
     }
 
     public OutgoingMessage MapToOutgoingMessage(Guid senderId)

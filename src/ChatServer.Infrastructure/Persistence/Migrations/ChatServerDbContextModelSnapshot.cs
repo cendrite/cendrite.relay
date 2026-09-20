@@ -57,7 +57,6 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("ChatServer.Domain.Entities.ChatMessage", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
@@ -213,6 +212,7 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                     b.HasOne("ChatServer.Domain.Aggregates.Client", null)
                         .WithMany("ChatMessages")
                         .HasForeignKey("RecipientId")
+                        .HasPrincipalKey("ConnectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
