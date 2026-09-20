@@ -1,8 +1,8 @@
 ﻿using Cypherly.Persistence.Outbox;
 
-namespace Cypherly.Persistence.Repositories;
+namespace ChatServer.Infrastructure.Persistence.Repositories;
 
-public interface IOutboxRepository
+internal interface IOutboxRepository
 {
     Task<OutboxMessage[]> GetUnprocessedAsync(int batchSize);
     Task MarkAsProcessedAsync(OutboxMessage message);

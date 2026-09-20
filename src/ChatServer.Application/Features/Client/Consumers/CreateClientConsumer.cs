@@ -22,7 +22,7 @@ public class CreateClientConsumer(
 
             var client = new Domain.Aggregates.Client(message.DeviceId, message.ConnectionId);
 
-            await clientRepository.CreateAsync(client);
+            await clientRepository.Create(client);
 
             await unitOfWork.SaveChangesAsync();
 

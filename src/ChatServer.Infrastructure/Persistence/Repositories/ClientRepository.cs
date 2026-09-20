@@ -6,15 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatServer.Infrastructure.Persistence.Repositories;
 
-public class ClientRepository(ChatServerDbContext ctx) : IClientRepository
+internal sealed class ClientRepository(ChatServerDbContext ctx) : IClientRepository
 {
-    public Task<Client?> GetAsync(ISpecification<Client> spec, CancellationToken ct = default)
+    public async Task<Client?> GetAsync(ISpecification<Client> spec, CancellationToken ct = default)
     {
         var q = ctx.Client.Where(spec.Criteria);
 
         q = spec.Includes.Aggregate(q, (current, include) => current.Include(include));
 
-        return q.FirstOrDefaultAsync(ct);
+        return await q.FirstOrDefaultAsync(ct);
     }
 
     public async Task CreateAsync(Client entity, CancellationToken ct = default)
@@ -26,11 +26,6 @@ public class ClientRepository(ChatServerDbContext ctx) : IClientRepository
     {
         return await ctx.Client.FindAsync([id], cancellationToken: ct)
             ?? throw new InvalidOperationException($"Client with ID {id} not found.");
-    }
-
-    public Task UpdateAsync(Client entity, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
     }
 
     public Task QueryAsync(Guid id, Func<IQueryable<Client>, IQueryable<Client>>? includeFunc, CancellationToken ct = default)
@@ -56,6 +51,4 @@ public class ClientRepository(ChatServerDbContext ctx) : IClientRepository
             ?? throw new InvalidOperationException($"Client with ID {id} not found.");
         ctx.Client.Remove(entity);
     }
-
-
 }

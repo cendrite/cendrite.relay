@@ -1,4 +1,6 @@
-﻿namespace ChatServer.Application.Features.Messaging.Models;
+﻿using ChatServer.Domain.Entities;
+
+namespace ChatServer.Application.Features.Messaging.Models;
 
 /// <summary>
 /// Model representing an outgoing message to be sent to a recipient.
@@ -11,4 +13,17 @@ public sealed class OutgoingMessage
     public required string ChatId { get; init; }
     public required string Payload { get; init; }
     public required DateTimeOffset Timestamp { get; init; }
+
+    public static OutgoingMessage MapFrom(ChatMessage chatMessage)
+    {
+        return new OutgoingMessage
+        {
+            Id = chatMessage.Id,
+            SenderId = chatMessage.SenderId,
+            RecipientId = chatMessage.RecipientId,
+            ChatId = chatMessage.ChatId,
+            Payload = chatMessage.Content,
+            Timestamp = chatMessage.Timestamp
+        };
+    }
 }

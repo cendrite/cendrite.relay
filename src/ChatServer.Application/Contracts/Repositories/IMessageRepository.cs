@@ -3,5 +3,6 @@ using ChatServer.Domain.Entities;
 
 public interface IMessageRepository : IRepository<ChatMessage>
 {
-    public Task<IReadOnlyCollection<ChatMessage>> GetBatchMessagesAsync(int recipientId, int batchCount, CancellationToken ct = default);
+    Task<IReadOnlyCollection<ChatMessage>> GetBatchMessagesAsync(Guid recipientId, int batchCount, CancellationToken ct = default);
+    void DeleteRange(IEnumerable<ChatMessage> messages);
 }

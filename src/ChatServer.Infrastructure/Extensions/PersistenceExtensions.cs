@@ -2,7 +2,6 @@ using System.Reflection;
 using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Infrastructure.Persistence.Repositories;
-using Cypherly.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +30,7 @@ internal static class PersistenceExtensions
     private static void AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IClientRepository, ClientRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
     }

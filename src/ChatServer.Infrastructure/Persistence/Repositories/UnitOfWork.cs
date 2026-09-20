@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace ChatServer.Infrastructure.Persistence.Repositories;
 
-public class UnitOfWork(ChatServerDbContext context) : IUnitOfWork
+internal sealed class UnitOfWork(ChatServerDbContext context) : IUnitOfWork
 {
     /// <summary>
     /// Saves all changes made in the context to the database.
