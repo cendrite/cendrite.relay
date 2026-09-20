@@ -1,11 +1,10 @@
 ﻿using ChatServer.Infrastructure.Persistence.Context;
 using Cypherly.Persistence.Outbox;
-using Cypherly.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatServer.Infrastructure.Persistence.Repositories;
 
-public class OutboxRepository(ChatServerDbContext context) : IOutboxRepository
+internal sealed class OutboxRepository(ChatServerDbContext ctx) : IOutboxRepository
 {
     /// <summary>
     /// Get unprocessed outbox messages
@@ -14,7 +13,7 @@ public class OutboxRepository(ChatServerDbContext context) : IOutboxRepository
     /// <returns>An Array of <see cref="OutboxMessage"/></returns>
     public async Task<OutboxMessage[]> GetUnprocessedAsync(int batchSize)
     {
-        return await context.OutboxMessage
+        return await ctx.OutboxMessage
             .Where(m => m.ProcessedOn == null)
             .Take(batchSize)
             .ToArrayAsync();

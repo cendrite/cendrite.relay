@@ -1,5 +1,6 @@
 using ChatServer.Application.Abstractions;
 using ChatServer.Application.Contracts.Repositories;
+using ChatServer.Application.Enums;
 using ChatServer.Domain.Common;
 using ChatServer.Domain.Events.Client;
 using Microsoft.Extensions.Logging;
@@ -24,8 +25,11 @@ public sealed class ConnectClientCommandHandler(
                 return Result.Fail(Error.Unauthorized());
             }
 
-            client.AddConnection(new Connection(cmd.TransientId, cmd.ClientId, cmd.HubType.ToString()));
-            client.AddDomainEvent(new ClientConnectedEvent(cmd.ClientId));
+            client.AddConnection(new Connection(cmd.TransientId, client.Id, cmd.HubType.ToString()));
+            client.AddDomainEvent(new ClientConnectedEvent(client.Id, client.ConnectionId, cmd.TransientId));
+
+            if (cmd.HubType is HubType.Message)
+                client.AddDomainEvent(new VacuumMessagesEvent(client.ConnectionId));
 
             await unitOfWork.SaveChangesAsync(ct);
 

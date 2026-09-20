@@ -1,7 +1,7 @@
 ﻿using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Domain.Abstractions;
+using ChatServer.Infrastructure.Persistence.Repositories;
 using Cypherly.Persistence.Outbox;
-using Cypherly.Persistence.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -10,7 +10,7 @@ using Quartz;
 namespace ChatServer.Infrastructure.Jobs;
 
 [DisallowConcurrentExecution]
-public class ProcessOutboxMessageJob(
+internal sealed class ProcessOutboxMessageJob(
     IOutboxRepository outboxRepository,
     IPublisher publisher,
     ILogger<ProcessOutboxMessageJob> logger,
