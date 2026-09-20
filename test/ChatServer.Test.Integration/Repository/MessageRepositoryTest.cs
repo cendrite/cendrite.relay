@@ -3,6 +3,7 @@ using ChatServer.Domain.Entities;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ChatServer.Test.Integration.Repository;
@@ -10,11 +11,13 @@ namespace ChatServer.Test.Integration.Repository;
 public class MessageRepositoryTest : IntegrationTestbase
 {
     private readonly IMessageRepository _sut;
+    private readonly IUnitOfWork _uow;
 
     public MessageRepositoryTest(IntegrationTestFactory<Program, ChatServerDbContext> factory) : base(factory)
     {
         var scope = factory.Services.CreateScope();
         _sut = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
+        _uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
     }
 
     /// <summary>
@@ -23,7 +26,7 @@ public class MessageRepositoryTest : IntegrationTestbase
     /// </summary>
     private async Task<Guid> SeedRecipientAsync()
     {
-        var client = new ChatServer.Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
 
         await Db.Client.AddAsync(client);
         await Db.SaveChangesAsync();
@@ -129,10 +132,10 @@ public class MessageRepositoryTest : IntegrationTestbase
 
         // Act
         _sut.DeleteRange(batch);
-        await Db.SaveChangesAsync();
+        await _uow.SaveChangesAsync(CancellationToken.None);
 
         // Assert
-        var remaining = await _sut.GetBatchMessagesAsync(recipientId, 10, ct: CancellationToken.None);
+        var remaining = await Db.ChatMessage.AsNoTracking().ToListAsync();
         remaining.Should().ContainSingle();
         remaining.Single().Content.Should().Be("second");
     }
