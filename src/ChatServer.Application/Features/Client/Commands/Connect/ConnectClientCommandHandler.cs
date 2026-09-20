@@ -24,8 +24,8 @@ public sealed class ConnectClientCommandHandler(
                 return Result.Fail(Error.Unauthorized());
             }
 
-            client.AddConnection(new Connection(cmd.TransientId, cmd.ClientId, cmd.HubType.ToString()));
-            client.AddDomainEvent(new ClientConnectedEvent(cmd.ClientId));
+            client.AddConnection(new Connection(cmd.TransientId, client.Id, cmd.HubType.ToString()));
+            client.AddDomainEvent(new ClientConnectedEvent(client.Id, client.ConnectionId, cmd.TransientId));
 
             await unitOfWork.SaveChangesAsync(ct);
 
