@@ -10,7 +10,7 @@ using Quartz;
 namespace ChatServer.Infrastructure.Jobs;
 
 [DisallowConcurrentExecution]
-public class ProcessOutboxMessageJob(
+internal sealed class ProcessOutboxMessageJob(
     IOutboxRepository outboxRepository,
     IPublisher publisher,
     ILogger<ProcessOutboxMessageJob> logger,

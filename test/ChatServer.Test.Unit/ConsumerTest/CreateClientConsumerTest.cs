@@ -38,7 +38,7 @@ public class CreateClientConsumerTest
         await _sut.Consume(fakeContext);
 
         // Assert
-        A.CallTo(() => _fakeRepository.Create(A<Client>._, CancellationToken.None)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeRepository.CreateAsync(A<Client>._, CancellationToken.None)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeUnitOfWork.SaveChangesAsync(CancellationToken.None)).MustHaveHappenedOnceExactly();
         A.CallTo(() => fakeContext.RespondAsync(A<CreateClientResponse>._)).MustHaveHappenedOnceExactly();
     }
@@ -50,13 +50,13 @@ public class CreateClientConsumerTest
         var fakeContext = A.Fake<ConsumeContext<CreateClientMessage>>();
         var fakeMessage = _fixture.Create<CreateClientMessage>();
         A.CallTo(() => fakeContext.Message).Returns(fakeMessage);
-        A.CallTo(() => _fakeRepository.Create(A<Client>._, CancellationToken.None)).Throws<Exception>();
+        A.CallTo(() => _fakeRepository.CreateAsync(A<Client>._, CancellationToken.None)).Throws<Exception>();
 
         // Act
         await _sut.Consume(fakeContext);
 
         // Assert
-        A.CallTo(() => _fakeRepository.Create(A<Client>._, CancellationToken.None)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeRepository.CreateAsync(A<Client>._, CancellationToken.None)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeUnitOfWork.SaveChangesAsync(CancellationToken.None)).MustNotHaveHappened();
         A.CallTo(() => fakeContext.RespondAsync(A<CreateClientResponse>._)).MustHaveHappenedOnceExactly();
     }

@@ -13,23 +13,20 @@ public class CreateClientConsumer(
     ILogger<CreateClientConsumer> logger)
     : IConsumer<CreateClientMessage>
 {
-    public async Task Consume(ConsumeContext<CreateClientMessage> context)
+    public async Task Consume(ConsumeContext<CreateClientMessage> ctx)
     {
-        var message = context.Message;
-        
         try
         {
+            var client = new Domain.Aggregates.Client(ctx.Message.DeviceId, ctx.Message.ConnectionId);
 
-            var client = new Domain.Aggregates.Client(message.DeviceId, message.ConnectionId);
-
-            await clientRepository.Create(client);
+            await clientRepository.CreateAsync(client);
 
             await unitOfWork.SaveChangesAsync();
 
-            await context.RespondAsync(new CreateClientResponse
+            await ctx.RespondAsync(new CreateClientResponse
             {
-                CausationId = message.CorrelationId,
-                CorrelationId = message.CorrelationId,
+                CausationId = ctx.Message.CorrelationId,
+                CorrelationId = ctx.Message.CorrelationId,
                 Error = null,
                 IsSuccess = true
             });
@@ -38,10 +35,10 @@ public class CreateClientConsumer(
         {
             logger.LogError(ex, "An Exception occured while attempting to create a client");
             
-            await context.RespondAsync(new CreateClientResponse
+            await ctx.RespondAsync(new CreateClientResponse
             {
-                CausationId = message.CorrelationId,
-                CorrelationId = message.CorrelationId,
+                CausationId = ctx.Message.CorrelationId,
+                CorrelationId = ctx.Message.CorrelationId,
                 Error = Error.Failure("An exception occured while attempting to create a client").Description,
                 IsSuccess = false
             });
