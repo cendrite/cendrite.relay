@@ -2,28 +2,36 @@ using System.Runtime.CompilerServices;
 using ChatServer.Application.Abstractions;
 using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Contracts.Services;
+using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Messaging.Models;
+using ChatServer.Application.Specifications.Client;
 using ChatServer.Domain.Entities;
 using ChatServer.Domain.Events.Client;
 
 public sealed class VacuumCachedMessagesEventHandler(
+    IClientRepository clientRepository,
     IMessageRepository messageRepository,
     IMessageSender messageSender,
     IUnitOfWork uow)
     : IDomainEventHandler<ClientConnectedEvent>
 {
-    public async Task Handle(ClientConnectedEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(ClientConnectedEvent ntf, CancellationToken ct)
     {
-        await foreach (var messages in GetBatchCachedMessagesAsync(notification.ClientId, 10, cancellationToken))
+        var client = await clientRepository.GetAsync(new ClientWithConnectionSpec(ntf.ConnectionId), ct);
+
+        if (client?.GetConnection(HubType.Message.ToString())?.TransientId is not { } transientId)
+            return;
+
+        await foreach (var messages in GetBatchCachedMessagesAsync(ntf.ConnectionId, 10, ct))
         {
             foreach (var message in messages)
             {
                 var outgoingMessage = OutgoingMessage.MapFrom(message);
-                await messageSender.SendMessageAsync(notification.TransientId, outgoingMessage, cancellationToken);
+                await messageSender.SendMessageAsync(transientId, outgoingMessage, ct);
             }
 
             messageRepository.DeleteRange(messages);
-            await uow.SaveChangesAsync(cancellationToken);
+            await uow.SaveChangesAsync(ct);
         }
     }
 

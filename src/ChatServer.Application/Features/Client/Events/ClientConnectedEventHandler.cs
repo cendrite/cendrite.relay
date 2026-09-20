@@ -1,5 +1,4 @@
 ﻿using ChatServer.Application.Abstractions;
-using ChatServer.Application.Contracts.Cache;
 using ChatServer.Domain.Events.Client;
 using Cypherly.Message.Contracts.Abstractions;
 using Cypherly.Message.Contracts.Messages.Client;
@@ -9,7 +8,6 @@ namespace ChatServer.Application.Features.Client.Events;
 
 public class ClientConnectedEventHandler(
     IProducer<ClientConnectedMessage> producer,
-    IMessageCache messageCache,
     IMessageRepository messageRepository,
     ILogger<ClientConnectedEventHandler> logger)
     : IDomainEventHandler<ClientConnectedEvent>
