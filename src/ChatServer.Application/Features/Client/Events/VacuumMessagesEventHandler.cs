@@ -39,11 +39,6 @@ public sealed class VacuumMessagesEventHandler(
         }
     }
 
-    /// <summary>
-    /// Pages through the recipient's mailbox with a keyset cursor. Offset paging would be wrong
-    /// here: each batch is deleted once sent, so a Skip would step over the rows that shifted
-    /// down into its place.
-    /// </summary>
     private async IAsyncEnumerable<IReadOnlyCollection<ChatMessage>> GetBatchMessagesAsync(
         Guid recipientId,
         int batchCount,
