@@ -15,23 +15,25 @@ public sealed class SendMessageCommandHandler(
     IClientRepository clientRepo,
     IMessageCache messageCache,
     IMessageSender messageSender,
+    IUnitOfWork unitOfWork,
     ILogger<SendMessageCommandHandler> logger)
     : ICommandHandler<SendMessageCommand, Receipt>
 {
-    public async Task<Result<Receipt>> Handle(SendMessageCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Receipt>> Handle(SendMessageCommand cmd, CancellationToken ct)
     {
         try
         {
-            var sender = await clientRepo.GetByIdAsync(request.SenderDeviceId, cancellationToken);
+            var sender = await clientRepo.GetByIdAsync(cmd.SenderDeviceId, ct);
             if (sender is null)
             {
-                logger.LogWarning("Sender client not found for device {DeviceId}", request.SenderDeviceId);
+                logger.LogWarning("Sender client not found for device {DeviceId}", cmd.SenderDeviceId);
                 return Result.Ok(Receipt.Failed);
             }
 
-            var workItems = request.Bundle.Select(m => WorkItem.BuildItem(m, sender.ConnectionId)).ToList();
+            var workItems = cmd.Bundle.Select(m => WorkItem.BuildItem(m, sender.ConnectionId)).ToList();
 
-            var receipt = await ProcessMessages(workItems, cancellationToken);
+            var receipt = await ProcessMessages(workItems, ct);
+            await unitOfWork.SaveChangesAsync(ct);
 
             return Result.Ok(receipt);
         }
@@ -47,21 +49,27 @@ public sealed class SendMessageCommandHandler(
         foreach (var item in workItems)
         {
             item.Recipient = await clientRepo.GetAsync(new ClientWithConnectionSpec(item.ChatMessage.RecipientId), ct);
-            if (item.Recipient?.GetConnection(HubType.Message.ToString()) is null)
-            {
-                logger.LogWarning("Recipient not found for message {MessageId}", item.ChatMessage.Id);
-            }
-
-            logger.LogInformation("found recipient: {Recipient}", item.Recipient);
         }
 
         var actions = workItems.Select(item => item.Recipient?.GetConnection(HubType.Message.ToString())?.TransientId is { } messageTransientId
             ? messageSender.SendMessageAsync(messageTransientId, item.OutgoingMessage, ct)
-            : messageCache.CacheMessageAsync(item.ChatMessage, ct));
+            : CacheMessages(item, ct));
 
         await Task.WhenAll(actions);
 
         return Receipt.Sent;
+    }
+
+    private async Task CacheMessages(WorkItem item, CancellationToken ct)
+    {
+        if(item.Recipient is null)
+        {
+            logger.LogWarning("Recipient client not found for message {MessageId}", item.ChatMessage.Id);
+            return;
+        }
+
+        await messageCache.CacheMessageAsync(item.ChatMessage, ct);
+        item.Recipient?.AddChatMessage(item.ChatMessage);
     }
 
     sealed internal class WorkItem
