@@ -72,7 +72,7 @@ public sealed class SendMessageCommandHandler(
     sealed internal class WorkItem
     {
         public required OutgoingMessage OutgoingMessage { get; init; }
-        public required ChatMessage ChatMessage { get; init; }
+        public required Message ChatMessage { get; init; }
         public Domain.Aggregates.Client? Recipient { get; set; }
 
         public static WorkItem BuildItem(IngoingMessage message, Guid senderId)

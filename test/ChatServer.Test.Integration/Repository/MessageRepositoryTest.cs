@@ -34,14 +34,14 @@ public class MessageRepositoryTest : IntegrationTestbase
         return client.ConnectionId;
     }
 
-    private async Task SeedMessagesAsync(params ChatMessage[] messages)
+    private async Task SeedMessagesAsync(params Message[] messages)
     {
         await Db.ChatMessage.AddRangeAsync(messages);
         await Db.SaveChangesAsync();
     }
 
-    private static ChatMessage Message(Guid recipientId, DateTime timestamp, string content = "ciphertext") =>
-        new(Guid.NewGuid(), Guid.NewGuid(), recipientId, "chat-id", null, content, timestamp);
+    private static Message Message(Guid recipientId, DateTime timestamp, string content = "ciphertext") =>
+        new(Guid.NewGuid(), Guid.NewGuid(), recipientId, null, content, timestamp);
 
     [Fact]
     public async Task GetBatchMessagesAsync_Should_Return_Oldest_Messages_First()

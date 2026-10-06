@@ -14,10 +14,10 @@ public class Client : AggregateRoot
     public string? TransientId { get; private set; }
 
     private readonly List<Media> _media = [];
-    private readonly List<ChatMessage> _chatMessages = [];
+    private readonly List<Message> _chatMessages = [];
     private readonly List<Connection> _connections = [];
 
-    public IReadOnlyCollection<ChatMessage> ChatMessages => _chatMessages;
+    public IReadOnlyCollection<Message> ChatMessages => _chatMessages;
     public IReadOnlyCollection<Media> Media => _media;
     public IReadOnlyCollection<Connection> Connections => _connections;
 
@@ -65,7 +65,7 @@ public class Client : AggregateRoot
         return media;
     }
 
-    public void AddChatMessage(ChatMessage message)
+    public void AddChatMessage(Message message)
     {
         if (_chatMessages.Any(m => m.Id == message.Id))
             return;

@@ -6,22 +6,22 @@ using Microsoft.EntityFrameworkCore;
 
 internal sealed class MessageRepository(ChatServerDbContext ctx) : IMessageRepository
 {
-    public async Task CreateAsync(ChatMessage entity, CancellationToken ct = default)
+    public async Task CreateAsync(Message entity, CancellationToken ct = default)
     {
         await ctx.ChatMessage.AddAsync(entity);
     }
 
-    public void Delete(ChatMessage entity)
+    public void Delete(Message entity)
     {
         ctx.ChatMessage.Remove(entity);
     }
 
-    public void DeleteRange(IEnumerable<ChatMessage> messages)
+    public void DeleteRange(IEnumerable<Message> messages)
     {
         ctx.ChatMessage.RemoveRange(messages);
     }
 
-    public async Task<ChatMessage?> GetAsync(ISpecification<ChatMessage> spec, CancellationToken ct = default)
+    public async Task<Message?> GetAsync(ISpecification<Message> spec, CancellationToken ct = default)
     {
         var q = ctx.ChatMessage.Where(spec.Criteria);
 
@@ -30,7 +30,7 @@ internal sealed class MessageRepository(ChatServerDbContext ctx) : IMessageRepos
         return await q.FirstOrDefaultAsync(ct);
     }
 
-    public async Task<IReadOnlyCollection<ChatMessage>> GetBatchMessagesAsync(
+    public async Task<IReadOnlyCollection<Message>> GetBatchMessagesAsync(
         Guid recipientId,
         int batchCount,
         MessageCursor? after = null,
@@ -53,7 +53,7 @@ internal sealed class MessageRepository(ChatServerDbContext ctx) : IMessageRepos
             .ToListAsync(ct);
     }
 
-    public async Task<ChatMessage> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<Message> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
         var message = await ctx.ChatMessage.FirstOrDefaultAsync(x => x.Id == id, ct);
 
@@ -65,7 +65,7 @@ internal sealed class MessageRepository(ChatServerDbContext ctx) : IMessageRepos
         return message;
     }
 
-    public void Update(ChatMessage entity, CancellationToken ct = default)
+    public void Update(Message entity, CancellationToken ct = default)
     {
         ctx.ChatMessage.Update(entity);
     }

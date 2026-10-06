@@ -39,7 +39,7 @@ public sealed class VacuumMessagesEventHandler(
         }
     }
 
-    private async IAsyncEnumerable<IReadOnlyCollection<ChatMessage>> GetBatchMessagesAsync(
+    private async IAsyncEnumerable<IReadOnlyCollection<Message>> GetBatchMessagesAsync(
         Guid recipientId,
         int batchCount,
         [EnumeratorCancellation] CancellationToken ct)
