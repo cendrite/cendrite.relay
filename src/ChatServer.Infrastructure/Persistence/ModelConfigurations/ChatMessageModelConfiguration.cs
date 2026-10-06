@@ -8,7 +8,7 @@ public class ChatMessageModelConfiguration : BaseEntityTypeConfiguration<Message
 {
     public override void Configure(EntityTypeBuilder<Message> builder)
     {
-        builder.ToTable("chat_message");
+        builder.ToTable("message");
 
         builder.HasKey(x => x.Id);
         

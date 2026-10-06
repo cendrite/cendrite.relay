@@ -54,16 +54,49 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                     b.ToTable("client", (string)null);
                 });
 
-            modelBuilder.Entity("ChatServer.Domain.Entities.ChatMessage", b =>
+            modelBuilder.Entity("ChatServer.Domain.Entities.Media", b =>
+                {
+                    b.Property<string>("MediaId")
+                        .HasColumnType("text")
+                        .HasColumnName("media_id");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("client_id");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("recepient_id");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated");
+
+                    b.HasKey("MediaId")
+                        .HasName("media_id");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("media", (string)null);
+                });
+
+            modelBuilder.Entity("ChatServer.Domain.Entities.Message", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    b.Property<string>("ChatId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("chat_id");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -102,45 +135,7 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("RecipientId");
 
-                    b.ToTable("chat_message", (string)null);
-                });
-
-            modelBuilder.Entity("ChatServer.Domain.Entities.Media", b =>
-                {
-                    b.Property<string>("MediaId")
-                        .HasColumnType("text")
-                        .HasColumnName("media_id");
-
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("client_id");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created");
-
-                    b.Property<DateTime?>("Deleted")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted");
-
-                    b.Property<Guid>("SenderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("recepient_id");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated");
-
-                    b.HasKey("MediaId")
-                        .HasName("media_id");
-
-                    b.HasIndex("ClientId");
-
-                    b.ToTable("media", (string)null);
+                    b.ToTable("message", (string)null);
                 });
 
             modelBuilder.Entity("Connection", b =>
@@ -207,21 +202,21 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                     b.ToTable("outbox_message", (string)null);
                 });
 
-            modelBuilder.Entity("ChatServer.Domain.Entities.ChatMessage", b =>
-                {
-                    b.HasOne("ChatServer.Domain.Aggregates.Client", null)
-                        .WithMany("ChatMessages")
-                        .HasForeignKey("RecipientId")
-                        .HasPrincipalKey("ConnectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ChatServer.Domain.Entities.Media", b =>
                 {
                     b.HasOne("ChatServer.Domain.Aggregates.Client", null)
                         .WithMany("Media")
                         .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ChatServer.Domain.Entities.Message", b =>
+                {
+                    b.HasOne("ChatServer.Domain.Aggregates.Client", null)
+                        .WithMany("ChatMessages")
+                        .HasForeignKey("RecipientId")
+                        .HasPrincipalKey("ConnectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
