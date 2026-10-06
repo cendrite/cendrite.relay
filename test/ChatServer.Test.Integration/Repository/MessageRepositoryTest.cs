@@ -41,7 +41,7 @@ public class MessageRepositoryTest : IntegrationTestbase
     }
 
     private static Message Message(Guid recipientId, DateTime timestamp, string content = "ciphertext") =>
-        new(Guid.NewGuid(), Guid.NewGuid(), recipientId, "chat-id", null, content, timestamp);
+        new(Guid.NewGuid(), Guid.NewGuid(), recipientId, null, content, timestamp);
 
     [Fact]
     public async Task GetBatchMessagesAsync_Should_Return_Oldest_Messages_First()

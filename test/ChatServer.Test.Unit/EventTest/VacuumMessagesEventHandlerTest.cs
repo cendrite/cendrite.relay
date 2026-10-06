@@ -39,7 +39,7 @@ public class VacuumMessagesEventHandlerTest
     private int _sequence;
 
     private Message Message() =>
-        new(Guid.NewGuid(), Guid.NewGuid(), _connectionId, "chat-id", null, "ciphertext",
+        new(Guid.NewGuid(), Guid.NewGuid(), _connectionId, null, "ciphertext",
             new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(_sequence++));
 
     private Client ClientWith(params string[] hubTypes)
