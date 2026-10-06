@@ -10,7 +10,7 @@ public class ChatMessageModelConfiguration : BaseEntityTypeConfiguration<Message
     {
         builder.ToTable("message");
 
-        builder.HasKey(x => x.Id);
+        builder.HasKey(x => new { x.Id, x.RecipientId });
         
         builder.Property(x => x.Id)
             .HasColumnName("id")
