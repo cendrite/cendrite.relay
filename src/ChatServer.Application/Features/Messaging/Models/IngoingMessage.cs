@@ -8,19 +8,17 @@ namespace ChatServer.Application.Features.Messaging.Models;
 public sealed class IngoingMessage
 {
     public required Guid Id { get; init; }
-    public required string ChatId { get; init; }
     public required Guid RecipientId { get; init; }
     public required string Payload { get; init; }
     public string? MessageToken { get; init; }
     public required DateTimeOffset Timestamp { get; init; }
 
-    public ChatMessage MapToChatMessage(Guid senderId)
+    public Message MapToChatMessage(Guid senderId)
     {
-        return new ChatMessage(
+        return new Message(
             id: Id,
             senderId: senderId,
             recipientId: RecipientId,
-            chatId: ChatId,
             messageToken: MessageToken,
             content: Payload,
             timestamp: Timestamp.UtcDateTime);
@@ -33,7 +31,6 @@ public sealed class IngoingMessage
             Id = Id,
             SenderId = senderId,
             RecipientId = RecipientId,
-            ChatId = ChatId,
             Payload = Payload,
             Timestamp = Timestamp
         };

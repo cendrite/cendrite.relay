@@ -10,18 +10,16 @@ public sealed class OutgoingMessage
     public required Guid Id { get; init; }
     public required Guid SenderId { get; init; }
     public required Guid RecipientId { get; init; }
-    public required string ChatId { get; init; }
     public required string Payload { get; init; }
     public required DateTimeOffset Timestamp { get; init; }
 
-    public static OutgoingMessage MapFrom(ChatMessage chatMessage)
+    public static OutgoingMessage MapFrom(Message chatMessage)
     {
         return new OutgoingMessage
         {
             Id = chatMessage.Id,
             SenderId = chatMessage.SenderId,
             RecipientId = chatMessage.RecipientId,
-            ChatId = chatMessage.ChatId,
             Payload = chatMessage.Content,
             Timestamp = chatMessage.Timestamp
         };

@@ -38,7 +38,7 @@ public class VacuumMessagesEventHandlerTest
 
     private int _sequence;
 
-    private ChatMessage Message() =>
+    private Message Message() =>
         new(Guid.NewGuid(), Guid.NewGuid(), _connectionId, "chat-id", null, "ciphertext",
             new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(_sequence++));
 
@@ -55,7 +55,7 @@ public class VacuumMessagesEventHandlerTest
     private void ClientResolvesTo(Client? client) =>
         A.CallTo(() => _fakeClientRepo.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._)).Returns(client);
 
-    private void RepositoryReturns(params IReadOnlyCollection<ChatMessage>[] batches) =>
+    private void RepositoryReturns(params IReadOnlyCollection<Message>[] batches) =>
         A.CallTo(() => _fakeMessageRepo.GetBatchMessagesAsync(_connectionId, A<int>._, A<MessageCursor?>._, A<CancellationToken>._))
             .ReturnsNextFromSequence(batches);
 
@@ -70,7 +70,7 @@ public class VacuumMessagesEventHandlerTest
 
         // Assert
         A.CallTo(() => _fakeSender.SendMessageAsync(A<string>._, A<OutgoingMessage>._, A<CancellationToken>._)).MustNotHaveHappened();
-        A.CallTo(() => _fakeMessageRepo.DeleteRange(A<IEnumerable<ChatMessage>>._)).MustNotHaveHappened();
+        A.CallTo(() => _fakeMessageRepo.DeleteRange(A<IEnumerable<Message>>._)).MustNotHaveHappened();
         A.CallTo(() => _fakeMessageRepo.GetBatchMessagesAsync(A<Guid>._, A<int>._, A<MessageCursor?>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
@@ -85,7 +85,7 @@ public class VacuumMessagesEventHandlerTest
 
         // Assert
         A.CallTo(() => _fakeSender.SendMessageAsync(A<string>._, A<OutgoingMessage>._, A<CancellationToken>._)).MustNotHaveHappened();
-        A.CallTo(() => _fakeMessageRepo.DeleteRange(A<IEnumerable<ChatMessage>>._)).MustNotHaveHappened();
+        A.CallTo(() => _fakeMessageRepo.DeleteRange(A<IEnumerable<Message>>._)).MustNotHaveHappened();
     }
 
     [Fact]
@@ -96,8 +96,8 @@ public class VacuumMessagesEventHandlerTest
 
         var first = Message();
         var second = Message();
-        IReadOnlyCollection<ChatMessage> batch = [first, second];
-        IReadOnlyCollection<ChatMessage> empty = [];
+        IReadOnlyCollection<Message> batch = [first, second];
+        IReadOnlyCollection<Message> empty = [];
         RepositoryReturns(batch, empty);
 
         // Act
@@ -116,8 +116,8 @@ public class VacuumMessagesEventHandlerTest
         // Arrange
         ClientResolvesTo(ClientWith(HubType.Message.ToString()));
 
-        IReadOnlyCollection<ChatMessage> batch = [Message()];
-        IReadOnlyCollection<ChatMessage> empty = [];
+        IReadOnlyCollection<Message> batch = [Message()];
+        IReadOnlyCollection<Message> empty = [];
         RepositoryReturns(batch, empty);
 
         // Act
@@ -137,8 +137,8 @@ public class VacuumMessagesEventHandlerTest
         ClientResolvesTo(ClientWith(HubType.Message.ToString()));
 
         // a full page keeps the drain going; the short page ends it
-        IReadOnlyCollection<ChatMessage> first = Enumerable.Range(0, 10).Select(_ => Message()).ToArray();
-        IReadOnlyCollection<ChatMessage> second = [Message()];
+        IReadOnlyCollection<Message> first = Enumerable.Range(0, 10).Select(_ => Message()).ToArray();
+        IReadOnlyCollection<Message> second = [Message()];
         RepositoryReturns(first, second);
 
         // Act
@@ -146,7 +146,7 @@ public class VacuumMessagesEventHandlerTest
 
         // Assert
         A.CallTo(() => _fakeSender.SendMessageAsync(A<string>._, A<OutgoingMessage>._, A<CancellationToken>._)).MustHaveHappened(11, Times.Exactly);
-        A.CallTo(() => _fakeMessageRepo.DeleteRange(A<IEnumerable<ChatMessage>>._)).MustHaveHappened(2, Times.Exactly);
+        A.CallTo(() => _fakeMessageRepo.DeleteRange(A<IEnumerable<Message>>._)).MustHaveHappened(2, Times.Exactly);
         A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustHaveHappened(2, Times.Exactly);
     }
 
@@ -156,7 +156,7 @@ public class VacuumMessagesEventHandlerTest
         // Arrange
         ClientResolvesTo(ClientWith(HubType.Message.ToString()));
 
-        IReadOnlyCollection<ChatMessage> empty = [];
+        IReadOnlyCollection<Message> empty = [];
         RepositoryReturns(empty);
 
         // Act
@@ -164,7 +164,7 @@ public class VacuumMessagesEventHandlerTest
 
         // Assert
         A.CallTo(() => _fakeSender.SendMessageAsync(A<string>._, A<OutgoingMessage>._, A<CancellationToken>._)).MustNotHaveHappened();
-        A.CallTo(() => _fakeMessageRepo.DeleteRange(A<IEnumerable<ChatMessage>>._)).MustNotHaveHappened();
+        A.CallTo(() => _fakeMessageRepo.DeleteRange(A<IEnumerable<Message>>._)).MustNotHaveHappened();
         A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustNotHaveHappened();
     }
 
@@ -174,8 +174,8 @@ public class VacuumMessagesEventHandlerTest
         // Arrange
         ClientResolvesTo(ClientWith(HubType.Message.ToString()));
 
-        IReadOnlyCollection<ChatMessage> batch = [Message()];
-        IReadOnlyCollection<ChatMessage> empty = [];
+        IReadOnlyCollection<Message> batch = [Message()];
+        IReadOnlyCollection<Message> empty = [];
         RepositoryReturns(batch, empty);
 
         A.CallTo(() => _fakeSender.SendMessageAsync(A<string>._, A<OutgoingMessage>._, A<CancellationToken>._)).Throws<Exception>();
@@ -185,7 +185,7 @@ public class VacuumMessagesEventHandlerTest
 
         // Assert
         await act.Should().ThrowAsync<Exception>();
-        A.CallTo(() => _fakeMessageRepo.DeleteRange(A<IEnumerable<ChatMessage>>._)).MustNotHaveHappened();
+        A.CallTo(() => _fakeMessageRepo.DeleteRange(A<IEnumerable<Message>>._)).MustNotHaveHappened();
         A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).MustNotHaveHappened();
     }
 
@@ -195,7 +195,7 @@ public class VacuumMessagesEventHandlerTest
         // Arrange
         ClientResolvesTo(ClientWith(HubType.Message.ToString()));
 
-        IReadOnlyCollection<ChatMessage> empty = [];
+        IReadOnlyCollection<Message> empty = [];
         RepositoryReturns(empty);
 
         // Act
@@ -215,8 +215,8 @@ public class VacuumMessagesEventHandlerTest
         var full = Enumerable.Range(0, 10).Select(_ => Message()).ToArray();
         var last = full[^1];
 
-        IReadOnlyCollection<ChatMessage> first = full;
-        IReadOnlyCollection<ChatMessage> second = [Message()];
+        IReadOnlyCollection<Message> first = full;
+        IReadOnlyCollection<Message> second = [Message()];
         RepositoryReturns(first, second);
 
         // Act
@@ -237,7 +237,7 @@ public class VacuumMessagesEventHandlerTest
         // Arrange
         ClientResolvesTo(ClientWith(HubType.Message.ToString()));
 
-        IReadOnlyCollection<ChatMessage> partial = [Message(), Message()];
+        IReadOnlyCollection<Message> partial = [Message(), Message()];
         RepositoryReturns(partial);
 
         // Act

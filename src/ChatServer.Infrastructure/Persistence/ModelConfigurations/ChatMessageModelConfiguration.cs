@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ChatServer.Infrastructure.Persistence.ModelConfigurations;
 
-public class ChatMessageModelConfiguration : BaseEntityTypeConfiguration<ChatMessage>
+public class ChatMessageModelConfiguration : BaseEntityTypeConfiguration<Message>
 {
-    public override void Configure(EntityTypeBuilder<ChatMessage> builder)
+    public override void Configure(EntityTypeBuilder<Message> builder)
     {
         builder.ToTable("chat_message");
 
@@ -23,10 +23,6 @@ public class ChatMessageModelConfiguration : BaseEntityTypeConfiguration<ChatMes
 
         builder.Property(x => x.RecipientId)
             .HasColumnName("recipient_id")
-            .IsRequired();
-
-        builder.Property(x => x.ChatId)
-            .HasColumnName("chat_id")
             .IsRequired();
 
         builder.Property(x => x.MessageToken)
