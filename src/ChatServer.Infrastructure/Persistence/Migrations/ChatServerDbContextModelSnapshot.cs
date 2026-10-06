@@ -98,6 +98,10 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid>("RecipientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("recipient_id");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text")
@@ -115,10 +119,6 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("message_token");
 
-                    b.Property<Guid>("RecipientId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("recipient_id");
-
                     b.Property<Guid>("SenderId")
                         .HasColumnType("uuid")
                         .HasColumnName("sender_id");
@@ -131,7 +131,7 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id", "RecipientId");
 
                     b.HasIndex("RecipientId");
 
