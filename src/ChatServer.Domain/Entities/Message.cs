@@ -1,3 +1,4 @@
+
 using ChatServer.Domain.Abstractions;
 
 namespace ChatServer.Domain.Entities;
