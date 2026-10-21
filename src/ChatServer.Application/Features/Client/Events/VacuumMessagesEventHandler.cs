@@ -59,7 +59,7 @@ public sealed class VacuumMessagesEventHandler(
                 yield break;
 
             var last = messages.Last();
-            cursor = new MessageCursor(last.Timestamp, last.Id);
+            cursor = new MessageCursor(last.Created, last.Id);
         }
     }
 }

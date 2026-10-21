@@ -36,11 +36,7 @@ public class VacuumMessagesEventHandlerTest
 
     private VacuumMessagesEvent Event() => new(_connectionId);
 
-    private int _sequence;
-
-    private Message Message() =>
-        new(Guid.NewGuid(), Guid.NewGuid(), _connectionId, null, "ciphertext",
-            new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(_sequence++));
+    private Message Message() => new(Guid.NewGuid(), Guid.NewGuid(), _connectionId, "ciphertext");
 
     private Client ClientWith(params string[] hubTypes)
     {
@@ -226,7 +222,7 @@ public class VacuumMessagesEventHandlerTest
         A.CallTo(() => _fakeMessageRepo.GetBatchMessagesAsync(
                 _connectionId,
                 10,
-                new MessageCursor(last.Timestamp, last.Id),
+                new MessageCursor(last.Created, last.Id),
                 A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }

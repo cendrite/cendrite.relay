@@ -8,24 +8,19 @@ public class Message : Entity
 {
     public Guid SenderId { get; init; }
     public Guid RecipientId { get; init; }
-    public string? MessageToken { get; init; }
-    public string Content { get; init; } 
-    public DateTime Timestamp { get; init; }
+    public string Content { get; init; }
 
     public Message() { }
 
     public Message(
-        Guid id, 
-        Guid senderId, 
-        Guid recipientId, 
-        string? messageToken, 
-        string content, 
-        DateTime timestamp) : base(id)
+        Guid id,
+        Guid senderId,
+        Guid recipientId,
+        string content) 
+        : base(id)
     {
         SenderId = senderId;
         RecipientId = recipientId;
-        MessageToken = messageToken;
         Content = content;
-        Timestamp = timestamp.ToUniversalTime();
     }
 }

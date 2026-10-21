@@ -10,8 +10,6 @@ public sealed class IngoingMessage
     public required Guid Id { get; init; }
     public required Guid RecipientId { get; init; }
     public required string Payload { get; init; }
-    public string? MessageToken { get; init; }
-    public required DateTimeOffset Timestamp { get; init; }
 
     public Message MapToChatMessage(Guid senderId)
     {
@@ -19,9 +17,7 @@ public sealed class IngoingMessage
             id: Id,
             senderId: senderId,
             recipientId: RecipientId,
-            messageToken: MessageToken,
-            content: Payload,
-            timestamp: Timestamp.UtcDateTime);
+            content: Payload);
     }
 
     public OutgoingMessage MapToOutgoingMessage(Guid senderId)
@@ -32,7 +28,6 @@ public sealed class IngoingMessage
             SenderId = senderId,
             RecipientId = RecipientId,
             Payload = Payload,
-            Timestamp = Timestamp
         };
     }
 }
