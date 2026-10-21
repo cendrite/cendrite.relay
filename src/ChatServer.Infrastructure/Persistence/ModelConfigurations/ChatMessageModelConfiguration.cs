@@ -25,15 +25,8 @@ public class ChatMessageModelConfiguration : BaseEntityTypeConfiguration<Message
             .HasColumnName("recipient_id")
             .IsRequired();
 
-        builder.Property(x => x.MessageToken)
-            .HasColumnName("message_token");
-
         builder.Property(x => x.Content)
             .HasColumnName("content")
-            .IsRequired();
-        
-        builder.Property(x=> x.Timestamp)
-            .HasColumnName("timestamp")
             .IsRequired();
         
         base.Configure(builder);

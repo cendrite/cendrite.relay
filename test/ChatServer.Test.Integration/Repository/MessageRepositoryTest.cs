@@ -34,14 +34,24 @@ public class MessageRepositoryTest : IntegrationTestbase
         return client.ConnectionId;
     }
 
+    private readonly Dictionary<Guid, DateTime> _created = [];
+
     private async Task SeedMessagesAsync(params Message[] messages)
     {
         await Db.ChatMessage.AddRangeAsync(messages);
+
+        foreach (var message in messages)
+            Db.Entry(message).Property(m => m.Created).CurrentValue = _created[message.Id];
+
         await Db.SaveChangesAsync();
     }
 
-    private static Message Message(Guid recipientId, DateTime timestamp, string content = "ciphertext") =>
-        new(Guid.NewGuid(), Guid.NewGuid(), recipientId, null, content, timestamp);
+    private Message Message(Guid recipientId, DateTime created, string content = "ciphertext")
+    {
+        var message = new Message(Guid.NewGuid(), Guid.NewGuid(), recipientId, content);
+        _created[message.Id] = created;
+        return message;
+    }
 
     [Fact]
     public async Task GetBatchMessagesAsync_Should_Return_Oldest_Messages_First()
@@ -154,7 +164,7 @@ public class MessageRepositoryTest : IntegrationTestbase
         // Act
         var first = await _sut.GetBatchMessagesAsync(recipientId, 2, ct: CancellationToken.None);
         var last = first.Last();
-        var second = await _sut.GetBatchMessagesAsync(recipientId, 2, new MessageCursor(last.Timestamp, last.Id), CancellationToken.None);
+        var second = await _sut.GetBatchMessagesAsync(recipientId, 2, new MessageCursor(last.Created, last.Id), CancellationToken.None);
 
         // Assert
         first.Select(m => m.Content).Should().ContainInOrder("message 0", "message 1");
@@ -162,7 +172,7 @@ public class MessageRepositoryTest : IntegrationTestbase
     }
 
     /// <summary>
-    /// The reason the cursor carries Id as well as Timestamp: a page boundary landing inside a
+    /// The reason the cursor carries Id as well as Created: a page boundary landing inside a
     /// run of identical timestamps must not skip or repeat rows.
     /// </summary>
     [Fact]
@@ -179,7 +189,7 @@ public class MessageRepositoryTest : IntegrationTestbase
         // Act
         var first = await _sut.GetBatchMessagesAsync(recipientId, 2, ct: CancellationToken.None);
         var last = first.Last();
-        var second = await _sut.GetBatchMessagesAsync(recipientId, 2, new MessageCursor(last.Timestamp, last.Id), CancellationToken.None);
+        var second = await _sut.GetBatchMessagesAsync(recipientId, 2, new MessageCursor(last.Created, last.Id), CancellationToken.None);
 
         // Assert
         first.Should().HaveCount(2);

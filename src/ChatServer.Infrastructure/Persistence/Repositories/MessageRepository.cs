@@ -40,14 +40,14 @@ internal sealed class MessageRepository(ChatServerDbContext ctx) : IMessageRepos
 
         if (after is { } cursor)
         {
-            var timestamp = cursor.Timestamp;
+            var created = cursor.Created;
             var id = cursor.Id;
 
-            query = query.Where(x => x.Timestamp > timestamp || (x.Timestamp == timestamp && x.Id > id));
+            query = query.Where(x => x.Created > created || (x.Created == created && x.Id > id));
         }
 
         return await query
-            .OrderBy(x => x.Timestamp)
+            .OrderBy(x => x.Created)
             .ThenBy(x => x.Id)
             .Take(batchCount)
             .ToListAsync(ct);
