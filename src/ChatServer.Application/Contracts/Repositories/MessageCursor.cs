@@ -1,3 +1,3 @@
 namespace ChatServer.Application.Contracts.Repositories;
 
-public readonly record struct MessageCursor(DateTime Timestamp, Guid Id);
+public readonly record struct MessageCursor(Guid Id);

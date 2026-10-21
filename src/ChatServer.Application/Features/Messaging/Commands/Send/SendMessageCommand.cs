@@ -5,6 +5,6 @@ namespace ChatServer.Application.Features.Messaging.Commands.Send;
 
 public sealed record SendMessageCommand : ICommand<Receipt>
 {
-    public required IReadOnlyCollection<IngoingMessage> Bundle { get; init; }
     public required Guid SenderDeviceId { get; init; }
+    public required IReadOnlyCollection<IngoingMessage> Bundle { get; init; }
 }
