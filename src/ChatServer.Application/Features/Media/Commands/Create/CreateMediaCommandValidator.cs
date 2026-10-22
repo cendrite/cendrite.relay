@@ -8,8 +8,5 @@ public sealed class CreateMediaCommandValidator : AbstractValidator<CreateMediaC
     {
         RuleFor(x => x.ClientId)
             .NotEmpty();
-
-        RuleFor(x => x.MediaId)
-            .NotEmpty();
-    }
+     }
 }
