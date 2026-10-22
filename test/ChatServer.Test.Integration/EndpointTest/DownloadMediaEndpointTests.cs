@@ -90,7 +90,7 @@ public class DownloadMediaEndpointTest(
 
         const string mediaId = "test-media-id";
         await StoreBlobAsync(mediaId, "Test media content");
-        testClient.AddMedia(new Domain.Entities.Media(mediaId, testClient.Id, testClient.ConnectionId));
+        testClient.AddMedia(new Domain.Entities.Media(mediaId, testClient.Id, testClient.ConnectionId, 1024));
         await Db.SaveChangesAsync();
 
         var httpClient = CreateClient(testClient.Id.ToString());

@@ -22,7 +22,7 @@ public sealed class CreateMediaCommandHandler(
             return Result.Fail<string>(Error.NotFound<Domain.Aggregates.Client>(cmd.ClientId.ToString()));
         }
 
-        if(client.GetTotalMediaSize() + cmd.Size > 100 * 1024 * 1024)
+        if (client.GetTotalMediaSize() + cmd.Size > 1024L * 1024 * 1024)
         {
             logger.LogWarning("Client with ID {ClientId} exceeded media size limit.", cmd.ClientId);
             return Result.Fail<string>(Error.Validation("Media size limit exceeded."));

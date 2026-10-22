@@ -121,6 +121,31 @@ public class UploadMediaEndpointTests(
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
     }
 
+    [Fact]
+    public async Task UploadMedia_Should_Return400_WhenPendingMediaExceedsLimit()
+    {
+        // Arrange
+        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        testClient.AddMedia(new Domain.Entities.Media(Guid.NewGuid().ToString(), testClient.Id, testClient.ConnectionId, 1024L * 1024 * 1024));
+        Db.Client.Add(testClient);
+        await Db.SaveChangesAsync();
+
+        var content = new MemoryStream(System.Text.Encoding.UTF8.GetBytes("Test media content"));
+
+        var httpClient = CreateClient(testClient.Id.ToString(), testClient.Id.ToString());
+
+        // Act
+        var response = await httpClient.PostAsync("/api/media/upload", new StreamContent(content));
+
+        // Assert
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+
+        var client = await Db.Client.AsNoTracking().Include(c => c.Media)
+            .Where(c => c.Id == testClient.Id).FirstOrDefaultAsync();
+
+        client!.Media.Should().ContainSingle();
+    }
+
     private static async Task<string> ReadMediaIdAsync(HttpResponseMessage response)
     {
         var body = await response.Content.ReadFromJsonAsync<JsonElement>();
