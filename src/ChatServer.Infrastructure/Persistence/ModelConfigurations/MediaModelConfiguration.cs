@@ -31,6 +31,10 @@ public class MediaModelConfiguration : BaseEntityTypeConfiguration<Media>
             .HasColumnName("recepient_id")
             .IsRequired();
 
+        builder.Property(x => x.Size)
+            .HasColumnName("size")
+            .IsRequired();
+
         builder.HasOne<Client>()
             .WithMany(x => x.Media)
             .HasForeignKey(x => x.ClientId)

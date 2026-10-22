@@ -22,7 +22,7 @@ public sealed class CreateMediaCommandHandler(
             return Result.Fail<string>(Error.NotFound<Domain.Aggregates.Client>(cmd.ClientId.ToString()));
         }
 
-        var media = new Domain.Entities.Media(Guid.NewGuid().ToString(), cmd.ClientId, client.ConnectionId);
+        var media = new Domain.Entities.Media(Guid.NewGuid().ToString(), cmd.ClientId, client.ConnectionId, cmd.Size);
 
         client.AddMedia(media);
 
