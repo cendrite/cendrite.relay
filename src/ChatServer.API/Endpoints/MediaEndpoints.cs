@@ -1,7 +1,6 @@
 using ChatServer.API.Common;
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Features.Media.Commands.Create;
-using ChatServer.Application.Features.Media.Commands.Update;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,16 +59,6 @@ internal sealed class MediaEndpoints : IEndpoint
                 logger.LogError(ex, "Failed to retrieve media with id {MediaId}", id);
                 return Results.Problem("Failed to retrieve media", statusCode: 500);
             }
-        });
-
-        group.MapPost("{id}/ack", async (
-                [FromRoute] string id,
-                ISender sender,
-                ILogger<MediaEndpoints> logger,
-                CancellationToken ct) =>
-        {
-            var result = await sender.Send(new UpdateMediaCommand { MediaId = id }, ct);
-            return result.Success ? Results.Ok() : result.ToProblemDetails();
         });
     }
 }
