@@ -21,14 +21,12 @@ public class IntegrationTestFactory<TProgram, TDbContext> : WebApplicationFactor
 {
     private readonly string StorageDirectory = Path.Combine(Directory.GetCurrentDirectory());
 
-    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:latest")
+    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder("postgres:latest")
         .WithCleanUp(true)
         .Build();
 
     private const int ValkeyPort = 6976;
-    private readonly IContainer _valkeyContainer = new ContainerBuilder()
-        .WithImage("valkey/valkey:latest")
+    private readonly IContainer _valkeyContainer = new ContainerBuilder("valkey/valkey:latest")
         .WithEnvironment("ALLOW_EMPTY_PASSWORD", "yes")
         .WithExposedPort(ValkeyPort)
         .WithPortBinding(ValkeyPort, 6379)
