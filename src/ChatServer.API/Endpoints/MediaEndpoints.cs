@@ -15,7 +15,6 @@ internal sealed class MediaEndpoints : IEndpoint
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapPost("/upload", async (
-                [FromQuery] string mediaId,
                 HttpRequest httpreq,
                 IMediaService mediaSvc,
                 ISender sender,
@@ -23,21 +22,19 @@ internal sealed class MediaEndpoints : IEndpoint
                 HttpContext ctx,
                 CancellationToken ct) =>
         {
-            if (!MediaIdValidator.IsValid(mediaId))
-            {
-                return Results.Problem("Invalid media id", statusCode: 400);
-            }
-
             try
             {
-                await mediaSvc.StoreAsync(mediaId, httpreq.Body, ct);
-                var result = await sender.Send(new CreateMediaCommand { ClientId = ctx.User.GetDeviceId(), MediaId = mediaId }, ct);
+                var result = await sender.Send(new CreateMediaCommand { ClientId = ctx.User.GetDeviceId() }, ct);
+                if (!result.Success)
+                    return result.ToProblemDetails();
 
-                return result.Success ? Results.Ok() : result.ToProblemDetails();
+                await mediaSvc.StoreAsync(result.RequiredValue, httpreq.Body, ct);
+
+                return Results.Ok(new { MediaId = result.Value });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to store media with id {MediaId} for user {UserId}", mediaId, ctx.User.Identity?.Name);
+                logger.LogError(ex, "Failed to store media for user {UserId}", ctx.User.Identity?.Name);
                 return Results.Problem("Failed to store media", statusCode: 500);
             }
         });
