@@ -16,12 +16,10 @@ public class Client : AggregateRoot
     private readonly List<Media> _media = [];
     private readonly List<Message> _chatMessages = [];
     private readonly List<Connection> _connections = [];
-    private readonly List<Event> _events = [];
 
     public IReadOnlyCollection<Message> ChatMessages => _chatMessages;
     public IReadOnlyCollection<Media> Media => _media;
     public IReadOnlyCollection<Connection> Connections => _connections;
-    public IReadOnlyCollection<Event> Events => _events;
 
     private Client() : base(Guid.Empty) { } // For EF Core
 
