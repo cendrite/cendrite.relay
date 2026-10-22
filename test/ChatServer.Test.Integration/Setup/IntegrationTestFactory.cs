@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Quartz;
 using Testcontainers.PostgreSql;
 
 namespace ChatServer.Test.Integration.Setup;
@@ -54,6 +55,9 @@ public class IntegrationTestFactory<TProgram, TDbContext> : WebApplicationFactor
                 options.UseNpgsql(_dbContainer.GetConnectionString(),
                     b => b.MigrationsAssembly(typeof(TDbContext).Assembly.FullName));
             });
+
+            services.Configure<QuartzOptions>(options =>
+                options["quartz.dataSource.default.connectionString"] = _dbContainer.GetConnectionString());
 
             // Mock out authentication and authorization for testing
             services.AddAuthentication("Test")
@@ -105,6 +109,14 @@ public class IntegrationTestFactory<TProgram, TDbContext> : WebApplicationFactor
     {
         await _dbContainer.StartAsync();
         await _valkeyContainer.StartAsync();
+
+        var options = new DbContextOptionsBuilder<TDbContext>()
+            .UseNpgsql(_dbContainer.GetConnectionString(),
+                b => b.MigrationsAssembly(typeof(TDbContext).Assembly.FullName))
+            .Options;
+
+        await using var context = (TDbContext)Activator.CreateInstance(typeof(TDbContext), options)!;
+        await context.Database.MigrateAsync();
     }
 
     public async new Task DisposeAsync()

@@ -13,7 +13,7 @@ public static class InfrastructureExtensions
 {
     public static void AddInfrastructure(this IServiceCollection svc, IConfiguration cfg, Assembly asm)
     {
-        svc.AddOutboxProcessingJob(asm);
+        svc.AddOutboxProcessingJob(cfg, asm);
         svc.ConfigureSettings(cfg);
         svc.AddPersistence(cfg, asm);
         svc.AddConnectionMultiplexer(cfg);
