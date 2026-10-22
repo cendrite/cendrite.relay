@@ -8,5 +8,9 @@ public sealed class CreateMediaCommandValidator : AbstractValidator<CreateMediaC
     {
         RuleFor(x => x.ClientId)
             .NotEmpty();
+
+        RuleFor(x => x.Size)
+            .GreaterThan(0)
+            .LessThanOrEqualTo(100 * 1024 * 1024);
     }
 }
