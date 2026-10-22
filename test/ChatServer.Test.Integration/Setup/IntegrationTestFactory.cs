@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Quartz;
 using Testcontainers.PostgreSql;
 
 namespace ChatServer.Test.Integration.Setup;
@@ -20,14 +21,12 @@ public class IntegrationTestFactory<TProgram, TDbContext> : WebApplicationFactor
 {
     private readonly string StorageDirectory = Path.Combine(Directory.GetCurrentDirectory());
 
-    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:latest")
+    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder("postgres:latest")
         .WithCleanUp(true)
         .Build();
 
     private const int ValkeyPort = 6976;
-    private readonly IContainer _valkeyContainer = new ContainerBuilder()
-        .WithImage("valkey/valkey:latest")
+    private readonly IContainer _valkeyContainer = new ContainerBuilder("valkey/valkey:latest")
         .WithEnvironment("ALLOW_EMPTY_PASSWORD", "yes")
         .WithExposedPort(ValkeyPort)
         .WithPortBinding(ValkeyPort, 6379)
@@ -54,6 +53,9 @@ public class IntegrationTestFactory<TProgram, TDbContext> : WebApplicationFactor
                 options.UseNpgsql(_dbContainer.GetConnectionString(),
                     b => b.MigrationsAssembly(typeof(TDbContext).Assembly.FullName));
             });
+
+            services.Configure<QuartzOptions>(options =>
+                options["quartz.dataSource.default.connectionString"] = _dbContainer.GetConnectionString());
 
             // Mock out authentication and authorization for testing
             services.AddAuthentication("Test")
@@ -105,6 +107,14 @@ public class IntegrationTestFactory<TProgram, TDbContext> : WebApplicationFactor
     {
         await _dbContainer.StartAsync();
         await _valkeyContainer.StartAsync();
+
+        var options = new DbContextOptionsBuilder<TDbContext>()
+            .UseNpgsql(_dbContainer.GetConnectionString(),
+                b => b.MigrationsAssembly(typeof(TDbContext).Assembly.FullName))
+            .Options;
+
+        await using var context = (TDbContext)Activator.CreateInstance(typeof(TDbContext), options)!;
+        await context.Database.MigrateAsync();
     }
 
     public async new Task DisposeAsync()
