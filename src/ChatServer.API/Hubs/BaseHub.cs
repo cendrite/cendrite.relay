@@ -3,7 +3,7 @@ using ChatServer.API.Common;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Client.Commands.Connect;
 using ChatServer.Application.Features.Client.Commands.Disconnect;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatServer.API.Hubs;

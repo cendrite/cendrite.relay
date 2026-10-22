@@ -19,7 +19,7 @@ public sealed class VacuumMessagesEventHandler(
 {
     private const int BatchSize = 10;
 
-    public async Task Handle(VacuumMessagesEvent ntf, CancellationToken ct)
+    public async ValueTask Handle(VacuumMessagesEvent ntf, CancellationToken ct)
     {
         var client = await clientRepository.GetAsync(new ClientWithConnectionSpec(ntf.ConnectionId), ct);
 

@@ -12,7 +12,7 @@ public class DisconnectClientCommandHandler(
     ILogger<DisconnectClientCommandHandler> logger)
     : ICommandHandler<DisconnectClientCommand>
 {
-    public async Task<Result> Handle(DisconnectClientCommand cmd, CancellationToken ct)
+    public async ValueTask<Result> Handle(DisconnectClientCommand cmd, CancellationToken ct)
     {
         try
         {

@@ -17,7 +17,7 @@ public sealed class SendMessageCommandHandler(
     ILogger<SendMessageCommandHandler> logger)
     : ICommandHandler<SendMessageCommand, Receipt>
 {
-    public async Task<Result<Receipt>> Handle(SendMessageCommand cmd, CancellationToken ct)
+    public async ValueTask<Result<Receipt>> Handle(SendMessageCommand cmd, CancellationToken ct)
     {
         try
         {

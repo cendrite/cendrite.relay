@@ -12,7 +12,7 @@ public class ClientConnectedEventHandler(
     ILogger<ClientConnectedEventHandler> logger)
     : IDomainEventHandler<ClientConnectedEvent>
 {
-    public async Task Handle(ClientConnectedEvent ntf, CancellationToken ct)
+    public async ValueTask Handle(ClientConnectedEvent ntf, CancellationToken ct)
     {
         var message = new ClientConnectedMessage()
         {

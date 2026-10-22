@@ -1,5 +1,5 @@
 ﻿using ChatServer.Domain.Abstractions;
-using MediatR;
+using Mediator;
 
 namespace ChatServer.Application.Abstractions;
 

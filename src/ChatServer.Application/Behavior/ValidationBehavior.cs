@@ -1,26 +1,26 @@
 ﻿using ChatServer.Domain.Common;
 using FluentValidation;
 using FluentValidation.Results;
-using MediatR;
+using Mediator;
 
 namespace ChatServer.Application.Behavior
 {
     public class ValidationBehavior<TRequest, TResponse>(IValidator<TRequest>? validator = null) : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
+        where TRequest : notnull, IMessage
         where TResponse : Result
     {
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async ValueTask<TResponse> Handle(TRequest request, MessageHandlerDelegate<TRequest, TResponse> next, CancellationToken cancellationToken)
         {
             if (validator == null)
             {
-                return await next();
+                return await next(request, cancellationToken);
             }
 
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
             if (validationResult.IsValid)
             {
-                return await next();
+                return await next(request, cancellationToken);
             }
 
             var error = GenerateErrorMessage(validationResult);

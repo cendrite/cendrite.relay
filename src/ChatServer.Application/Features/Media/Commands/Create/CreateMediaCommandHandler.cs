@@ -12,7 +12,7 @@ public sealed class CreateMediaCommandHandler(
     ILogger<CreateMediaCommandHandler> logger)
     : ICommandHandler<CreateMediaCommand, string>
 {
-    public async Task<Result<string>> Handle(CreateMediaCommand cmd, CancellationToken ct)
+    public async ValueTask<Result<string>> Handle(CreateMediaCommand cmd, CancellationToken ct)
     {
         var client = await clRepo.GetAsync(new ClientWithMediaSpec(cmd.ClientId), ct);
 
