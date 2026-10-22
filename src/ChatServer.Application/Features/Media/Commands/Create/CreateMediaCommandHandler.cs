@@ -10,16 +10,16 @@ public sealed class CreateMediaCommandHandler(
     IClientRepository clRepo,
     IUnitOfWork uow,
     ILogger<CreateMediaCommandHandler> logger)
-    : ICommandHandler<CreateMediaCommand, Guid>
+    : ICommandHandler<CreateMediaCommand, string>
 {
-    public async Task<Result<Guid>> Handle(CreateMediaCommand cmd, CancellationToken ct)
+    public async Task<Result<string>> Handle(CreateMediaCommand cmd, CancellationToken ct)
     {
         var client = await clRepo.GetAsync(new ClientWithMediaSpec(cmd.ClientId), ct);
 
         if (client is null)
         {
             logger.LogCritical("Client with ID {ClientId} not found.", cmd.ClientId);
-            return Result.Fail<Guid>(Error.NotFound<Domain.Aggregates.Client>(cmd.ClientId.ToString()));
+            return Result.Fail<string>(Error.NotFound<Domain.Aggregates.Client>(cmd.ClientId.ToString()));
         }
 
         var media = new Domain.Entities.Media(Guid.NewGuid().ToString(), cmd.ClientId, client.ConnectionId);
@@ -28,6 +28,6 @@ public sealed class CreateMediaCommandHandler(
 
         await uow.SaveChangesAsync(ct);
 
-        return Result.Ok(media.Id);
+        return Result.Ok(media.MediaId);
     }
 }
