@@ -13,7 +13,7 @@ public sealed class ConnectClientCommandHandler(
     ILogger<ConnectClientCommandHandler> logger)
     : ICommandHandler<ConnectClientCommand>
 {
-    public async Task<Result> Handle(ConnectClientCommand cmd, CancellationToken ct)
+    public async ValueTask<Result> Handle(ConnectClientCommand cmd, CancellationToken ct)
     {
         try
         {

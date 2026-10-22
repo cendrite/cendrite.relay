@@ -1,7 +1,7 @@
 ﻿using ChatServer.API.Clients;
 using ChatServer.Application.Features.Messaging.Commands.Send;
 using ChatServer.Application.Features.Messaging.Models;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Authorization;
 
 namespace ChatServer.API.Hubs;

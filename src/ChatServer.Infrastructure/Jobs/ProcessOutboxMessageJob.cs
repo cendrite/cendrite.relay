@@ -2,7 +2,7 @@
 using ChatServer.Domain.Abstractions;
 using ChatServer.Infrastructure.Persistence.Repositories;
 using Cypherly.Persistence.Outbox;
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Quartz;

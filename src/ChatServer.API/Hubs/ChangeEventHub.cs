@@ -1,5 +1,5 @@
 ﻿using ChatServer.API.Clients;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Authorization;
 
 namespace ChatServer.API.Hubs;

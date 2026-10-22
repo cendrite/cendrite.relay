@@ -1,7 +1,7 @@
 using ChatServer.API.Common;
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Features.Media.Commands.Create;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
 internal sealed class MediaEndpoints : IEndpoint
