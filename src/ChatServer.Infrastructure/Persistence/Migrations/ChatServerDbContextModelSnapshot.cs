@@ -76,6 +76,10 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("recepient_id");
 
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint")
+                        .HasColumnName("size");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer")
                         .HasColumnName("status");
