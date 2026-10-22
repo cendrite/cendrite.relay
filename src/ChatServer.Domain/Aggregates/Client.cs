@@ -72,4 +72,6 @@ public class Client : AggregateRoot
 
         _chatMessages.Add(message);
     }
+
+    public long GetTotalMediaSize() => _media.Sum(m => m.Size);
 }

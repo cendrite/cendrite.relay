@@ -23,7 +23,12 @@ internal sealed class MediaEndpoints : IEndpoint
         {
             try
             {
-                var result = await sender.Send(new CreateMediaCommand { ClientId = ctx.User.GetDeviceId() }, ct);
+                var result = await sender.Send(new CreateMediaCommand
+                {
+                    ClientId = ctx.User.GetDeviceId(),
+                    Size = httpreq.ContentLength ?? 0
+                }, ct);
+
                 if (!result.Success)
                     return result.ToProblemDetails();
 

@@ -22,7 +22,13 @@ public sealed class CreateMediaCommandHandler(
             return Result.Fail<string>(Error.NotFound<Domain.Aggregates.Client>(cmd.ClientId.ToString()));
         }
 
-        var media = new Domain.Entities.Media(Guid.NewGuid().ToString(), cmd.ClientId, client.ConnectionId);
+        if (client.GetTotalMediaSize() + cmd.Size > 1024L * 1024 * 1024)
+        {
+            logger.LogWarning("Client with ID {ClientId} exceeded media size limit.", cmd.ClientId);
+            return Result.Fail<string>(Error.Validation("Media size limit exceeded."));
+        }
+
+        var media = new Domain.Entities.Media(Guid.NewGuid().ToString(), cmd.ClientId, client.ConnectionId, cmd.Size);
 
         client.AddMedia(media);
 
