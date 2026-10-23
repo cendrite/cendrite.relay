@@ -10,17 +10,24 @@ internal static class JobExtensions
 {
     private const string ConnectionStringName = "ChatServerDbConnectionString";
 
-    internal static void AddOutboxProcessingJob(this IServiceCollection services, IConfiguration configuration, Assembly assembly)
+    internal static void AddJobs(this IServiceCollection services, IConfiguration configuration, Assembly assembly)
     {
         services.AddQuartz(configure =>
         {
             configure.SchedulerId = "AUTO";
 
-            var jobKey = new JobKey($"{nameof(ProcessOutboxMessageJob)}-{assembly.GetName()}");
+            var outboxJobKey = new JobKey($"{nameof(ProcessOutboxMessageJob)}-{assembly.GetName()}");
 
-            configure.AddJob<ProcessOutboxMessageJob>(jobKey)
-                .AddTrigger(trigger => trigger.ForJob(jobKey)
+            configure.AddJob<ProcessOutboxMessageJob>(outboxJobKey)
+                .AddTrigger(trigger => trigger.ForJob(outboxJobKey)
                     .WithSimpleSchedule(schedule => schedule.WithIntervalInSeconds(10).RepeatForever()));
+
+            var mediaRetentionJobKey = new JobKey($"{nameof(MediaRetentionJob)}-{assembly.GetName()}");
+
+            configure.AddJob<MediaRetentionJob>(mediaRetentionJobKey)
+                .AddTrigger(trigger => trigger.ForJob(mediaRetentionJobKey)
+                    .StartNow()
+                    .WithSimpleSchedule(schedule => schedule.WithIntervalInHours(1).RepeatForever()));
 
             configure.UsePersistentStore(store =>
             {
