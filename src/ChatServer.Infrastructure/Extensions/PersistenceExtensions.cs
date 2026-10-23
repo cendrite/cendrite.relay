@@ -31,6 +31,7 @@ internal static class PersistenceExtensions
     {
         services.AddScoped<IClientRepository, ClientRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
     }

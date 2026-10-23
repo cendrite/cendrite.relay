@@ -1,8 +1,7 @@
 using ChatServer.Application.Contracts.Repositories;
-using ChatServer.Application.Contracts.Services;
-using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Base;
 using ChatServer.Application.Features.ChangeEvent.Payloads;
+using ChatServer.Application.Features.ChangeEvent.Services;
 using ChatServer.Application.Specifications.Client;
 using Cypherly.Message.Contracts.Messages.Device;
 using Cypherly.Message.Contracts.Messages.User;
@@ -13,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace ChatServer.Application.Features.ChangeEvent.Handlers
 {
     public sealed class ClientLoginConsumer(
-        IChangeEventNotifier notifier,
+        ChangeEventDispatcher dispatcher,
         IClientRepository clientRepository,
         IUnitOfWork unitOfWork,
         IRequestClient<ConnectionIdsProxyMessage> connectionIdsClient,
@@ -29,22 +28,22 @@ namespace ChatServer.Application.Features.ChangeEvent.Handlers
                 foreach (var connectionId in proxyResult.Item2)
                 {
                     var client = await clientRepository.GetAsync(new ClientWithConnectionSpec(connectionId), context.CancellationToken);
-                    var connection = client?.GetConnection(HubType.ChangeEvent.ToString());
 
-                    if (connection is not null)
-                    {
-                        await notifier.NotifyAsync(connection.TransientId, new Base.ChangeEvent(
-                            Guid.NewGuid(),
-                            ChangeEventType.UserLoggedIn,
-                            "UserLogin",
-                            "User logged in",
-                            new UserLoggedInEvent
-                            {
-                                UserTag = proxyResult.Item1,
-                                ConnectionId = context.Message.ConnectionId,
-                            }));
-                    }
+                    if (client is null) continue;
+
+                    await dispatcher.DispatchAsync(client, new Base.ChangeEvent(
+                        Guid.NewGuid(),
+                        ChangeEventType.UserLoggedIn,
+                        "UserLogin",
+                        "User logged in",
+                        new UserLoggedInEvent
+                        {
+                            UserTag = proxyResult.Item1,
+                            ConnectionId = context.Message.ConnectionId,
+                        }), context.CancellationToken);
                 }
+
+                await unitOfWork.SaveChangesAsync(context.CancellationToken);
             }
             catch (Exception ex)
             {

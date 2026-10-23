@@ -31,6 +31,9 @@ public sealed class ConnectClientCommandHandler(
             if (cmd.HubType is HubType.Message)
                 client.AddDomainEvent(new VacuumMessagesEvent(client.ConnectionId));
 
+            if (cmd.HubType is HubType.ChangeEvent)
+                client.AddDomainEvent(new VacuumChangeEventsEvent(client.ConnectionId));
+
             await unitOfWork.SaveChangesAsync(ct);
 
             return Result.Ok();

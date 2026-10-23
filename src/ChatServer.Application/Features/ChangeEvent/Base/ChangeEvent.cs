@@ -1,4 +1,7 @@
-﻿namespace ChatServer.Application.Features.ChangeEvent.Base;
+﻿using System.Text.Json;
+using ChatServer.Domain.Entities;
+
+namespace ChatServer.Application.Features.ChangeEvent.Base;
 
 public class ChangeEvent(Guid id, ChangeEventType type, string title, string description, object data)
 {
@@ -31,4 +34,31 @@ public class ChangeEvent(Guid id, ChangeEventType type, string title, string des
     /// Payload containing the data of the event
     /// </summary>
     public object Data { get; private set; } = data;
+
+    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
+
+    /// <summary>
+    /// Maps the event to a <see cref="Event"/> so it can be held until the recipient connects
+    /// </summary>
+    public Event ToEvent(Guid recipientId) => new(
+        Id,
+        recipientId,
+        Type.ToString(),
+        Title,
+        Description,
+        OccurredOn,
+        JsonSerializer.Serialize(Data, Data.GetType(), SerializerOptions));
+
+    /// <summary>
+    /// Restores a held event. The payload is kept as raw JSON, so it reaches the client in the same shape it was stored in.
+    /// </summary>
+    public static ChangeEvent FromEvent(Event evt) => new(
+        evt.Id,
+        Enum.Parse<ChangeEventType>(evt.Type),
+        evt.Title,
+        evt.Description,
+        JsonSerializer.Deserialize<JsonElement>(evt.Data, SerializerOptions))
+    {
+        OccurredOn = evt.OccurredOn
+    };
 }

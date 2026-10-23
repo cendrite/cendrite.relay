@@ -52,7 +52,7 @@ public class VacuumMessagesEventHandlerTest
         A.CallTo(() => _fakeClientRepo.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._)).Returns(client);
 
     private void RepositoryReturns(params IReadOnlyCollection<Message>[] batches) =>
-        A.CallTo(() => _fakeMessageRepo.GetBatchMessagesAsync(_connectionId, A<int>._, A<MessageCursor?>._, A<CancellationToken>._))
+        A.CallTo(() => _fakeMessageRepo.GetBatchMessagesAsync(_connectionId, A<int>._, A<PageCursor?>._, A<CancellationToken>._))
             .ReturnsNextFromSequence(batches);
 
     [Fact]
@@ -67,7 +67,7 @@ public class VacuumMessagesEventHandlerTest
         // Assert
         A.CallTo(() => _fakeSender.SendMessageAsync(A<string>._, A<OutgoingMessage>._, A<CancellationToken>._)).MustNotHaveHappened();
         A.CallTo(() => _fakeMessageRepo.DeleteRange(A<IEnumerable<Message>>._)).MustNotHaveHappened();
-        A.CallTo(() => _fakeMessageRepo.GetBatchMessagesAsync(A<Guid>._, A<int>._, A<MessageCursor?>._, A<CancellationToken>._)).MustNotHaveHappened();
+        A.CallTo(() => _fakeMessageRepo.GetBatchMessagesAsync(A<Guid>._, A<int>._, A<PageCursor?>._, A<CancellationToken>._)).MustNotHaveHappened();
     }
 
     [Fact]
@@ -222,7 +222,7 @@ public class VacuumMessagesEventHandlerTest
         A.CallTo(() => _fakeMessageRepo.GetBatchMessagesAsync(
                 _connectionId,
                 10,
-                new MessageCursor(last.Created, last.Id),
+                new PageCursor(last.Created, last.Id),
                 A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
@@ -240,7 +240,7 @@ public class VacuumMessagesEventHandlerTest
         await _sut.Handle(Event(), CancellationToken.None);
 
         // Assert
-        A.CallTo(() => _fakeMessageRepo.GetBatchMessagesAsync(A<Guid>._, A<int>._, A<MessageCursor?>._, A<CancellationToken>._))
+        A.CallTo(() => _fakeMessageRepo.GetBatchMessagesAsync(A<Guid>._, A<int>._, A<PageCursor?>._, A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeMessageRepo.DeleteRange(partial)).MustHaveHappenedOnceExactly();
     }

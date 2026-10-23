@@ -31,6 +31,7 @@ public class IntegrationTestbase : IDisposable
     public void Dispose()
     {
         Db.ChatMessage.ExecuteDelete();
+        Db.Event.ExecuteDelete();
         Db.Client.ExecuteDelete();
         Db.OutboxMessage.ExecuteDelete();
         Harness.Stop();

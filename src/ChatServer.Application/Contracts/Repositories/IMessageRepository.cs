@@ -10,7 +10,7 @@ public interface IMessageRepository : IRepository<Message>
     Task<IReadOnlyCollection<Message>> GetBatchMessagesAsync(
         Guid recipientId,
         int batchCount,
-        MessageCursor? after = null,
+        PageCursor? after = null,
         CancellationToken ct = default);
 
     void DeleteRange(IEnumerable<Message> messages);

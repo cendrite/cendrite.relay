@@ -11,6 +11,7 @@ public sealed class ChatServerDbContext(DbContextOptions options) : DbContext(op
     public DbSet<Client> Client { get; init; }
     public DbSet<Message> ChatMessage { get; init; }
     public DbSet<Media> Media { get; init; }
+    public DbSet<Event> Event { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
