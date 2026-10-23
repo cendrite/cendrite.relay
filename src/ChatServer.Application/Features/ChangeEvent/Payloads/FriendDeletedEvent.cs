@@ -1,4 +1,4 @@
-﻿namespace ChatServer.Application.Features.ChangeEvent.Event;
+﻿namespace ChatServer.Application.Features.ChangeEvent.Payloads;
 
 public sealed record FriendDeletedEvent
 {

@@ -2,7 +2,7 @@
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Base;
-using ChatServer.Application.Features.ChangeEvent.Event;
+using ChatServer.Application.Features.ChangeEvent.Payloads;
 using ChatServer.Application.Specifications.Client;
 using Cypherly.Message.Contracts.Messages.Friendship;
 using MassTransit;
