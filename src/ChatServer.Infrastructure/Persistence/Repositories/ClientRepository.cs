@@ -40,6 +40,18 @@ internal sealed class ClientRepository(ChatServerDbContext ctx) : IClientReposit
         return query.FirstOrDefaultAsync(c => c.Id == id, cancellationToken: ct);
     }
 
+    public async Task<IReadOnlyCollection<Client>> GetWithExpiredMediaAsync(
+        DateTime cutoff,
+        int batchCount,
+        CancellationToken ct = default)
+    {
+        return await ctx.Client
+            .Where(c => c.Media.Any(m => m.Created < cutoff))
+            .Include(c => c.Media.Where(m => m.Created < cutoff))
+            .Take(batchCount)
+            .ToListAsync(ct);
+    }
+
     public void Delete(Client entity)
     {
         ctx.Client.Remove(entity);
