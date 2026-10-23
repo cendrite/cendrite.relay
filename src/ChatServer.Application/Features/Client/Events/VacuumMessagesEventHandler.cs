@@ -44,7 +44,7 @@ public sealed class VacuumMessagesEventHandler(
         int batchCount,
         [EnumeratorCancellation] CancellationToken ct)
     {
-        MessageCursor? cursor = null;
+        PageCursor? cursor = null;
 
         while (true)
         {
@@ -59,7 +59,7 @@ public sealed class VacuumMessagesEventHandler(
                 yield break;
 
             var last = messages.Last();
-            cursor = new MessageCursor(last.Created, last.Id);
+            cursor = new PageCursor(last.Created, last.Id);
         }
     }
 }

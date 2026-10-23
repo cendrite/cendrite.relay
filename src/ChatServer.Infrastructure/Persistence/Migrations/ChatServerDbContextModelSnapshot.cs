@@ -54,6 +54,60 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                     b.ToTable("client", (string)null);
                 });
 
+            modelBuilder.Entity("ChatServer.Domain.Entities.Event", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("RecipientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("recipient_id");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("data");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<DateTime>("OccurredOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_on");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated");
+
+                    b.HasKey("Id", "RecipientId");
+
+                    b.HasIndex("RecipientId", "Created", "Id")
+                        .HasDatabaseName("idx_event_recipient_id_created_id");
+
+                    b.ToTable("event", (string)null);
+                });
+
             modelBuilder.Entity("ChatServer.Domain.Entities.Media", b =>
                 {
                     b.Property<string>("MediaId")
@@ -198,6 +252,16 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                     b.ToTable("outbox_message", (string)null);
                 });
 
+            modelBuilder.Entity("ChatServer.Domain.Entities.Event", b =>
+                {
+                    b.HasOne("ChatServer.Domain.Aggregates.Client", null)
+                        .WithMany("Events")
+                        .HasForeignKey("RecipientId")
+                        .HasPrincipalKey("ConnectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ChatServer.Domain.Entities.Media", b =>
                 {
                     b.HasOne("ChatServer.Domain.Aggregates.Client", null)
@@ -231,6 +295,8 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                     b.Navigation("ChatMessages");
 
                     b.Navigation("Connections");
+
+                    b.Navigation("Events");
 
                     b.Navigation("Media");
                 });

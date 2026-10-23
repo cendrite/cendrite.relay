@@ -164,7 +164,7 @@ public class MessageRepositoryTest : IntegrationTestbase
         // Act
         var first = await _sut.GetBatchMessagesAsync(recipientId, 2, ct: CancellationToken.None);
         var last = first.Last();
-        var second = await _sut.GetBatchMessagesAsync(recipientId, 2, new MessageCursor(last.Created, last.Id), CancellationToken.None);
+        var second = await _sut.GetBatchMessagesAsync(recipientId, 2, new PageCursor(last.Created, last.Id), CancellationToken.None);
 
         // Assert
         first.Select(m => m.Content).Should().ContainInOrder("message 0", "message 1");
@@ -189,7 +189,7 @@ public class MessageRepositoryTest : IntegrationTestbase
         // Act
         var first = await _sut.GetBatchMessagesAsync(recipientId, 2, ct: CancellationToken.None);
         var last = first.Last();
-        var second = await _sut.GetBatchMessagesAsync(recipientId, 2, new MessageCursor(last.Created, last.Id), CancellationToken.None);
+        var second = await _sut.GetBatchMessagesAsync(recipientId, 2, new PageCursor(last.Created, last.Id), CancellationToken.None);
 
         // Assert
         first.Should().HaveCount(2);

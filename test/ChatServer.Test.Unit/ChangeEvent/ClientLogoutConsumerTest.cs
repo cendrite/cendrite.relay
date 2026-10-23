@@ -4,6 +4,7 @@ using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Contracts.Services;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Handlers;
+using ChatServer.Application.Features.ChangeEvent.Services;
 using ChatServer.Domain.Aggregates;
 using ChatServer.Domain.Entities;
 using Cypherly.Message.Contracts.Messages.Device;
@@ -34,7 +35,7 @@ public sealed class ClientLogoutConsumerTest
         var fakeLogger = A.Fake<ILogger<ClientLogoutConsumer>>();
 
         _sut = new ClientLogoutConsumer(
-                _fakeChangeEventNotifier,
+                new ChangeEventDispatcher(_fakeChangeEventNotifier),
                 _fakeClientRepository,
                 _fakeUnitOfWork,
                 _fakeConnectionIdsClient,

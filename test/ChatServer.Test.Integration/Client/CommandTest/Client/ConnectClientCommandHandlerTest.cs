@@ -1,6 +1,7 @@
 ﻿using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Client.Commands.Connect;
+using ChatServer.Domain.Events.Client;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup;
 using FluentAssertions;
@@ -59,7 +60,9 @@ public class ConnectClientCommandHandlerTest : IntegrationTestbase
 
         // Assert
         result.Success.Should().BeTrue();
-        Db.OutboxMessage.Should().HaveCount(1);
+        Db.OutboxMessage.Select(o => o.Type).AsEnumerable().Should().HaveCount(2)
+            .And.Contain(t => t.StartsWith(typeof(ClientConnectedEvent).FullName!))
+            .And.Contain(t => t.StartsWith(typeof(VacuumChangeEventsEvent).FullName!));
 
 
         var updatedClient = await Db.Client.AsNoTracking().Include(c => c.Connections).FirstOrDefaultAsync(c=> c.Id  == client.Id);

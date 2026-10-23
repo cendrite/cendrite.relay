@@ -1,8 +1,7 @@
 ﻿using ChatServer.Application.Contracts.Repositories;
-using ChatServer.Application.Contracts.Services;
-using ChatServer.Application.Enums;
 using ChatServer.Application.Features.ChangeEvent.Base;
 using ChatServer.Application.Features.ChangeEvent.Payloads;
+using ChatServer.Application.Features.ChangeEvent.Services;
 using ChatServer.Application.Specifications.Client;
 using Cypherly.Message.Contracts.Messages.Profile;
 using MassTransit;
@@ -11,8 +10,9 @@ using Microsoft.Extensions.Logging;
 namespace ChatServer.Application.Features.ChangeEvent.Handlers;
 
 public class AvatarUpdatedConsumer(
-    IChangeEventNotifier changeEventNotifier,
+    ChangeEventDispatcher dispatcher,
     IClientRepository clientRepository,
+    IUnitOfWork unitOfWork,
     ILogger<AvatarUpdatedConsumer> logger)
     : IConsumer<AvatarUpdatedMessage>
 {
@@ -27,12 +27,13 @@ public class AvatarUpdatedConsumer(
             foreach (var connectionId in message.ConnectionIds)
             {
                 var client = await clientRepository.GetAsync(new ClientWithConnectionSpec(connectionId), ctx.CancellationToken);
-                var connection = client?.GetConnection(HubType.ChangeEvent.ToString());
 
-                if (connection is null) continue;
+                if (client is null) continue;
 
-                await changeEventNotifier.NotifyAsync(connection.TransientId, changeEvent, ctx.CancellationToken);
+                await dispatcher.DispatchAsync(client, changeEvent, ctx.CancellationToken);
             }
+
+            await unitOfWork.SaveChangesAsync(ctx.CancellationToken);
         }
         catch (Exception ex)
         {

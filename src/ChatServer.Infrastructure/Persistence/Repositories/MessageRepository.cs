@@ -33,7 +33,7 @@ internal sealed class MessageRepository(ChatServerDbContext ctx) : IMessageRepos
     public async Task<IReadOnlyCollection<Message>> GetBatchMessagesAsync(
         Guid recipientId,
         int batchCount,
-        MessageCursor? after = null,
+        PageCursor? after = null,
         CancellationToken ct = default)
     {
         var query = ctx.ChatMessage.Where(x => x.RecipientId == recipientId);
