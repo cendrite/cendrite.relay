@@ -46,15 +46,13 @@ public static class ObservabilityExtensions
             options.AddOtlpExporter();
         });
 
-        if (builder.Environment.IsDevelopment())
+        builder.Logging.AddSimpleConsole(o =>
         {
-            builder.Logging.AddSimpleConsole(o =>
-            {
-                o.SingleLine = true;
-                o.TimestampFormat = "HH:mm:ss ";
-                o.IncludeScopes = true;
-            });
-        }
+            o.SingleLine = true;
+            o.IncludeScopes = true;
+            o.TimestampFormat = builder.Environment.IsDevelopment() ? "HH:mm:ss " : "yyyy-MM-ddTHH:mm:ss.fffZ ";
+            o.UseUtcTimestamp = !builder.Environment.IsDevelopment();
+        });
     }
 }
 
