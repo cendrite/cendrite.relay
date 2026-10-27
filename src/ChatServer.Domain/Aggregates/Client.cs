@@ -6,6 +6,7 @@ namespace ChatServer.Domain.Aggregates;
 public class Client : AggregateRoot
 {
     public Guid ConnectionId { get; private set; }
+    public Guid UserId { get; private set; }
 
     /// <summary>
     /// TransientId is used to store the SignalR connectionId for caching purposes.
@@ -25,10 +26,13 @@ public class Client : AggregateRoot
 
     private Client() : base(Guid.Empty) { } // For EF Core
 
-    public Client(Guid id, Guid connectionId) : base(id)
+    public Client(Guid id, Guid connectionId, Guid userId) : base(id)
     {
         ConnectionId = connectionId;
+        UserId = userId;
     }
+
+    public bool IsOnline() => _connections.Count > 0;
 
     public void SetTransientId(string transientId) => TransientId = transientId;
 

@@ -51,7 +51,7 @@ public class ConnectClientCommandHandlerTest
     {
         // Arrange
         var clientId = Guid.NewGuid();
-        var client = new Client(clientId, Guid.NewGuid());
+        var client = new Client(clientId, Guid.NewGuid(), Guid.NewGuid());
 
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
 
@@ -77,7 +77,7 @@ public class ConnectClientCommandHandlerTest
     {
         // Arrange
         var clientId = Guid.NewGuid();
-        var client = new Client(clientId, Guid.NewGuid());
+        var client = new Client(clientId, Guid.NewGuid(), Guid.NewGuid());
         client.AddConnection(new Connection("old-transient-id", clientId, HubType.ChangeEvent.ToString()));
 
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
@@ -103,7 +103,7 @@ public class ConnectClientCommandHandlerTest
     {
         // Arrange
         var clientId = Guid.NewGuid();
-        var client = new Client(clientId, Guid.NewGuid());
+        var client = new Client(clientId, Guid.NewGuid(), Guid.NewGuid());
 
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
         A.CallTo(() => _fakeUow.SaveChangesAsync(A<CancellationToken>._)).Throws<Exception>();
@@ -130,7 +130,7 @@ public class ConnectClientCommandHandlerTest
         // Arrange
         var clientId = Guid.NewGuid();
         var connectionId = Guid.NewGuid();
-        var client = new Client(clientId, connectionId);
+        var client = new Client(clientId, connectionId, Guid.NewGuid());
 
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
 
@@ -155,7 +155,7 @@ public class ConnectClientCommandHandlerTest
     {
         // Arrange
         var clientId = Guid.NewGuid();
-        var client = new Client(clientId, Guid.NewGuid());
+        var client = new Client(clientId, Guid.NewGuid(), Guid.NewGuid());
 
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
 
@@ -181,7 +181,7 @@ public class ConnectClientCommandHandlerTest
         // Arrange
         var clientId = Guid.NewGuid();
         var connectionId = Guid.NewGuid();
-        var client = new Client(clientId, connectionId);
+        var client = new Client(clientId, connectionId, Guid.NewGuid());
 
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
 
@@ -206,7 +206,7 @@ public class ConnectClientCommandHandlerTest
     {
         // Arrange
         var clientId = Guid.NewGuid();
-        var client = new Client(clientId, Guid.NewGuid());
+        var client = new Client(clientId, Guid.NewGuid(), Guid.NewGuid());
 
         A.CallTo(() => _fakeRepository.GetByIdAsync(clientId, CancellationToken.None)).Returns(client);
 

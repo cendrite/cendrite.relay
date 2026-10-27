@@ -32,7 +32,7 @@ public class DeviceDeletedConsumerTest : IntegrationTestbase
     public async Task Consume_Given_Offline_Client_Should_Hold_Deleted_Event_And_Keep_Client()
     {
         // Arrange
-        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         await Db.Client.AddAsync(client);
         await Db.SaveChangesAsync();
 

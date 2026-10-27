@@ -55,6 +55,7 @@ app.RegisterMinimalEndpoints();
 if (env.IsProduction())
 {
     app.Services.ApplyPendingMigrations();
+    app.Services.ClearStaleConnections();
 }
 
 app.UseCors("AllowElectron");

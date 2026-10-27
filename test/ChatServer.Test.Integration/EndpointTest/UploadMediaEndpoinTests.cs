@@ -20,7 +20,7 @@ public class UploadMediaEndpointTests(
     public async Task UploadMedia_Should_StoreMediaInBlobStore_And_ReturnGeneratedMediaId()
     {
         // Arrange
-        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         Db.Client.Add(testClient);
         await Db.SaveChangesAsync();
 
@@ -52,7 +52,7 @@ public class UploadMediaEndpointTests(
     public async Task UploadMedia_Should_IgnoreClientSuppliedSenderId_AndDeriveItFromTheAuthenticatedConnection()
     {
         // Arrange
-        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         Db.Client.Add(testClient);
         await Db.SaveChangesAsync();
 
@@ -79,8 +79,8 @@ public class UploadMediaEndpointTests(
     public async Task UploadMedia_Should_IgnoreClientSuppliedMediaId_And_NotOverwriteExistingMedia()
     {
         // Arrange
-        var owner = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
-        var attacker = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var owner = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        var attacker = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         Db.Client.AddRange(owner, attacker);
         await Db.SaveChangesAsync();
 
@@ -125,7 +125,7 @@ public class UploadMediaEndpointTests(
     public async Task UploadMedia_Should_Return400_WhenPendingMediaExceedsLimit()
     {
         // Arrange
-        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         testClient.AddMedia(new Domain.Entities.Media(Guid.NewGuid().ToString(), testClient.Id, testClient.ConnectionId, 1024L * 1024 * 1024));
         Db.Client.Add(testClient);
         await Db.SaveChangesAsync();

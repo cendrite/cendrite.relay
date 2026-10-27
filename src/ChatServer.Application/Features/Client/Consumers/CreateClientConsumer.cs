@@ -17,7 +17,7 @@ public class CreateClientConsumer(
     {
         try
         {
-            var client = new Domain.Aggregates.Client(ctx.Message.DeviceId, ctx.Message.ConnectionId);
+            var client = new Domain.Aggregates.Client(ctx.Message.DeviceId, ctx.Message.ConnectionId, ctx.Message.UserId);
 
             await clientRepository.CreateAsync(client);
 

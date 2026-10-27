@@ -52,6 +52,14 @@ internal sealed class ClientRepository(ChatServerDbContext ctx) : IClientReposit
             .ToListAsync(ct);
     }
 
+    public async Task<IReadOnlyCollection<Client>> GetActiveByUserIdAsync(Guid userId, CancellationToken ct = default)
+    {
+        return await ctx.Client
+            .Where(c => c.UserId == userId && c.Deleted == null)
+            .Include(c => c.Connections)
+            .ToListAsync(ct);
+    }
+
     public void Delete(Client entity)
     {
         ctx.Client.Remove(entity);

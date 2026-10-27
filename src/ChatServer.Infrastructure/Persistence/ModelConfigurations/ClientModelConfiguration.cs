@@ -24,6 +24,13 @@ public class ClientModelConfiguration : BaseEntityTypeConfiguration<Client>
             .HasDatabaseName("idx_client_connection_id")
             .IsUnique();
 
+        builder.Property(x => x.UserId)
+            .HasColumnName("user_id")
+            .IsRequired();
+
+        builder.HasIndex(x => x.UserId)
+            .HasDatabaseName("idx_client_user_id");
+
         builder.Ignore(x => x.TransientId);
 
         builder.HasMany(x => x.ChatMessages)
