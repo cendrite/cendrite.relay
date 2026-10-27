@@ -1,5 +1,5 @@
 using ChatServer.Application.Contracts.Repositories;
-using ChatServer.Application.Features.Client.Consumers;
+using ChatServer.Application.Features.ChangeEvent.Handlers;
 using ChatServer.Domain.Entities;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup;
