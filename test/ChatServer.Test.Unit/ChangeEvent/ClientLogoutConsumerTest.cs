@@ -93,6 +93,8 @@ public sealed class ClientLogoutConsumerTest
                 A<CancellationToken>._,
                 A<RequestTimeout>._))
             .MustHaveHappenedOnceExactly();
+
+        Assert.NotNull(client.Deleted);
     }
 
     [Fact]
