@@ -25,6 +25,12 @@ public sealed class ConnectClientCommandHandler(
                 return Result.Fail(Error.Unauthorized());
             }
 
+            if (client.Deleted is not null)
+            {
+                logger.LogWarning("Revoked client with ID: {ID} attempted to connect", cmd.ClientId);
+                return Result.Fail(Error.Revoked());
+            }
+
             client.AddConnection(new Connection(cmd.TransientId, client.Id, cmd.HubType.ToString()));
             client.AddDomainEvent(new ClientConnectedEvent(client.Id, client.ConnectionId, cmd.TransientId));
 
