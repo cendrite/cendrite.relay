@@ -73,8 +73,8 @@ app.MapScalarApiReference(options =>
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHub<ChangeEventHub>("change-eventhub");
-app.MapHub<MessageHub>("message-hub");
+app.MapHub<ChangeEventHub>("change-eventhub", options => options.CloseOnAuthenticationExpiration = true);
+app.MapHub<MessageHub>("message-hub", options => options.CloseOnAuthenticationExpiration = true);
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 

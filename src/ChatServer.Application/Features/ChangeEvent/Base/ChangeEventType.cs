@@ -12,5 +12,6 @@ public enum ChangeEventType
     UserBlocked,
     UserUnblocked,
     UserLoggedOut,
-    UserLoggedIn
+    UserLoggedIn,
+    Deleted,
 }

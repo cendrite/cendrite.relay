@@ -6,6 +6,8 @@ public sealed record Error(string Code, ErrorType Type, string? Description = nu
 
     public static Error Unauthorized() => new("unauthorized", ErrorType.Unauthorized);
 
+    public static Error Revoked() => new("client.revoked", ErrorType.Unauthorized);
+
     public static Error Validation(string description) => new("validation.error", ErrorType.Validation, description);
 
     public static Error Failure(string? description = null) => new("internal.server.error", ErrorType.Failure, description);

@@ -47,8 +47,14 @@ public sealed class ClientLogoutConsumer(
                     }), context.CancellationToken);
             }
 
-            await clientRepository.DeleteAsync(context.Message.DeviceId, context.CancellationToken);
-            await unitOfWork.SaveChangesAsync();
+            var loggedOutClient = await clientRepository.GetAsync(new ClientByIdSpec(context.Message.DeviceId), context.CancellationToken);
+
+            if (loggedOutClient is null)
+                logger.LogWarning("No client found for device id: {DeviceId}", context.Message.DeviceId);
+            else
+                loggedOutClient.SetDelete();
+
+            await unitOfWork.SaveChangesAsync(context.CancellationToken);
         }
         catch (Exception ex)
         {

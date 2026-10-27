@@ -3,6 +3,7 @@ using ChatServer.API.Common;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Client.Commands.Connect;
 using ChatServer.Application.Features.Client.Commands.Disconnect;
+using ChatServer.Domain.Common;
 using Mediator;
 using Microsoft.AspNetCore.SignalR;
 
@@ -26,6 +27,9 @@ public class BaseHub<T>(
             TransientId = Context.ConnectionId,
             HubType = GetHubType()
         });
+
+        if (result.Error == Error.Revoked())
+            throw new HubException(Error.Revoked().Code);
 
         if (result.Success is false)
         {

@@ -1,5 +1,7 @@
 ﻿using ChatServer.API.Handlers;
+using ChatServer.API.Hubs.Filters;
 using ChatServer.Application.Contracts.Services;
+using Microsoft.AspNetCore.SignalR;
 using StackExchange.Redis;
 
 namespace ChatServer.API.Extensions;
@@ -11,6 +13,7 @@ public static class SignalRExtensions
         services.AddSignalR(options =>
             {
                 options.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10 MB
+                options.AddFilter<RevokedClientHubFilter>();
             })
             .AddStackExchangeRedis(options =>
             {

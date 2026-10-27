@@ -1,6 +1,7 @@
 ﻿using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Enums;
 using ChatServer.Application.Features.Client.Commands.Connect;
+using ChatServer.Domain.Common;
 using ChatServer.Domain.Events.Client;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup;
@@ -37,6 +38,33 @@ public class ConnectClientCommandHandlerTest : IntegrationTestbase
 
         // Assert
         result.Success.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Handle_Deleted_Client_Should_Return_Revoked_And_Not_Connect()
+    {
+        // Arrange
+        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        client.SetDelete();
+
+        await Db.Client.AddAsync(client);
+        await Db.SaveChangesAsync();
+
+        var command = new ConnectClientCommand()
+        {
+            ClientId = client.Id,
+            TransientId = "TransientId",
+            HubType = HubType.ChangeEvent
+        };
+
+        // Act
+        var result = await _sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Success.Should().BeFalse();
+        result.Error.Should().Be(Error.Revoked());
+        Db.OutboxMessage.Any().Should().BeFalse();
+        Db.Client.AsNoTracking().Include(c => c.Connections).Single(c => c.Id == client.Id).Connections.Should().BeEmpty();
     }
 
     [Fact]
