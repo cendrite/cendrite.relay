@@ -43,7 +43,7 @@ public class MediaRetentionJobTest : IntegrationTestbase
     public async Task Execute_Should_Delete_Media_Older_Than_Retention_And_Keep_Recent_Media()
     {
         // Arrange
-        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         Db.Client.Add(client);
 
         var expired = await SeedMediaAsync(client, DateTime.UtcNow.AddDays(-31));
@@ -71,7 +71,7 @@ public class MediaRetentionJobTest : IntegrationTestbase
     public async Task Execute_Should_Do_Nothing_When_No_Media_Is_Expired()
     {
         // Arrange
-        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         Db.Client.Add(client);
 
         var recent = await SeedMediaAsync(client, DateTime.UtcNow.AddDays(-1));

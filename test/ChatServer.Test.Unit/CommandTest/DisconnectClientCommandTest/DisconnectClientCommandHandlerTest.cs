@@ -46,7 +46,7 @@ public class DisconnectClientCommandHandlerTest
     {
         // Arrange
         const string transientId = "test_transient_id";
-        var client = new Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         client.AddConnection(new Connection(transientId, client.Id, HubType.ChangeEvent.ToString()));
 
         A.CallTo(() => _fakeRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._)).Returns(client);
@@ -68,7 +68,7 @@ public class DisconnectClientCommandHandlerTest
     {
         // Arrange
         const string transientId = "test_transient_id";
-        var client = new Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         client.AddConnection(new Connection(transientId, client.Id, HubType.ChangeEvent.ToString()));
 
         A.CallTo(() => _fakeRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._)).Returns(client);

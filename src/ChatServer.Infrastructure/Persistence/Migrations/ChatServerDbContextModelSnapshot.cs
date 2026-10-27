@@ -45,11 +45,18 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ConnectionId")
                         .IsUnique()
                         .HasDatabaseName("idx_client_connection_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("idx_client_user_id");
 
                     b.ToTable("client", (string)null);
                 });

@@ -49,7 +49,7 @@ public class VacuumChangeEventsEventHandlerTest
 
     private Client ClientWith(params string[] hubTypes)
     {
-        var client = new Client(Guid.NewGuid(), _connectionId);
+        var client = new Client(Guid.NewGuid(), _connectionId, Guid.NewGuid());
 
         foreach (var hubType in hubTypes)
             client.AddConnection(new Connection(ChangeEventTransientId, client.Id, hubType));

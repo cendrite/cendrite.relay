@@ -43,5 +43,6 @@ public class CreateClientConsumerTest : IntegrationTestbase
         Db.Client.Count().Should().Be(1);
         Db.Client.First().Id.Should().Be(request.DeviceId);
         Db.Client.First().ConnectionId.Should().Be(request.ConnectionId);
+        Db.Client.First().UserId.Should().Be(request.UserId);
     }
 }

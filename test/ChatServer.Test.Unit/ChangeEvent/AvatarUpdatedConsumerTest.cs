@@ -38,7 +38,7 @@ public class AvatarUpdatedConsumerTest
     public async Task Consume_Given_Valid_ConnectedClient_Should_NotifyClient()
     {
         // Arrange
-        var client = new Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         client.AddConnection(new Connection("transientId", client.Id, HubType.ChangeEvent.ToString()));
 
         var profilePictureUpdatedMessage = _fixture.Build<AvatarUpdatedMessage>()
@@ -81,7 +81,7 @@ public class AvatarUpdatedConsumerTest
     public async Task Consume_Given_Client_Without_ChangeEvent_Connection_Should_Hold_Event()
     {
         // Arrange
-        var client = new Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
 
         var profilePictureUpdatedMessage = _fixture.Build<AvatarUpdatedMessage>()
             .With(c => c.ConnectionIds, [client.ConnectionId]).Create();
@@ -109,7 +109,7 @@ public class AvatarUpdatedConsumerTest
     public async Task Consume_Given_Connected_Client_Should_Not_Hold_Event()
     {
         // Arrange
-        var client = new Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         client.AddConnection(new Connection("transientId", client.Id, HubType.ChangeEvent.ToString()));
 
         var profilePictureUpdatedMessage = _fixture.Build<AvatarUpdatedMessage>()

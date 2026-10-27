@@ -44,7 +44,7 @@ public class ConnectClientCommandHandlerTest : IntegrationTestbase
     public async Task Handle_Deleted_Client_Should_Return_Revoked_And_Not_Connect()
     {
         // Arrange
-        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         client.SetDelete();
 
         await Db.Client.AddAsync(client);
@@ -71,7 +71,7 @@ public class ConnectClientCommandHandlerTest : IntegrationTestbase
     public async Task Handle_Valid_Connect_Command_Should_Connect_Client()
     {
         // Arrange
-        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
 
         await Db.Client.AddAsync(client);
         await Db.SaveChangesAsync();

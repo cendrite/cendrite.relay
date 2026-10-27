@@ -84,7 +84,7 @@ public class DownloadMediaEndpointTest(
     public async Task DownloadMedia_Should_NotChangeMediaStatus_BecauseGetIsAPureRead()
     {
         // Arrange - a registered media in its default (Pending) state
-        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var testClient = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         Db.Client.Add(testClient);
         await Db.SaveChangesAsync();
 

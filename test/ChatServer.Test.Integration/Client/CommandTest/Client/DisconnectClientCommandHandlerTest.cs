@@ -28,7 +28,7 @@ public class DisconnectClientCommandHandlerTest : IntegrationTestbase
     {
         // Arrange
         const string transientId = "TransientId";
-        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         client.AddConnection(new Connection(transientId, client.Id, nameof(HubType.ChangeEvent)));
 
         await Db.AddAsync(client);

@@ -46,7 +46,7 @@ public sealed class ClientLogoutConsumerTest
     public async Task Consume_Given_Valid_ConnectedClient_Should_NotifyClient()
     {
         // Arrange
-        var client = new Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         var userLogoutMessage = _fixture.Build<UserLogoutMessage>()
             .With(c => c.DeviceId, client.Id)
             .Create();

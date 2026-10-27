@@ -26,7 +26,7 @@ public class MessageRepositoryTest : IntegrationTestbase
     /// </summary>
     private async Task<Guid> SeedRecipientAsync()
     {
-        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid());
+        var client = new Domain.Aggregates.Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
 
         await Db.Client.AddAsync(client);
         await Db.SaveChangesAsync();

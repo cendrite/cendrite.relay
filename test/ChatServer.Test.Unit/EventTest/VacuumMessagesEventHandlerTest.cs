@@ -40,7 +40,7 @@ public class VacuumMessagesEventHandlerTest
 
     private Client ClientWith(params string[] hubTypes)
     {
-        var client = new Client(Guid.NewGuid(), _connectionId);
+        var client = new Client(Guid.NewGuid(), _connectionId, Guid.NewGuid());
 
         foreach (var hubType in hubTypes)
             client.AddConnection(new Connection(MessageTransientId, client.Id, hubType));
