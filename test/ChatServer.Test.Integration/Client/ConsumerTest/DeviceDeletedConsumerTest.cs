@@ -3,7 +3,7 @@ using ChatServer.Application.Features.ChangeEvent.Handlers;
 using ChatServer.Application.Features.ChangeEvent.Services;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup;
-using Cypherly.Message.Contracts.Messages.Device;
+using Cendrite.Message.Contracts.Messages.Device;
 using FakeItEasy;
 using FluentAssertions;
 using MassTransit;

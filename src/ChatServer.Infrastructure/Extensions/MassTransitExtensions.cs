@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using ChatServer.Infrastructure.Messaging;
 using ChatServer.Infrastructure.Settings;
-using Cypherly.Message.Contracts.Abstractions;
-using Cypherly.Message.Contracts.Messages.Client;
+using Cendrite.Message.Contracts.Abstractions;
+using Cendrite.Message.Contracts.Messages.Client;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

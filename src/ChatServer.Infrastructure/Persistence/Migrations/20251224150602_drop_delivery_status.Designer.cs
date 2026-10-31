@@ -105,7 +105,7 @@ namespace ChatServer.Infrastructure.Persistence.Migrations
                     b.ToTable("chat_message", (string)null);
                 });
 
-            modelBuilder.Entity("Cypherly.Persistence.Outbox.OutboxMessage", b =>
+            modelBuilder.Entity("Cendrite.Persistence.Outbox.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

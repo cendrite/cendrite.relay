@@ -1,5 +1,5 @@
 ﻿using ChatServer.Infrastructure.Persistence.Context;
-using Cypherly.Persistence.Outbox;
+using Cendrite.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatServer.Infrastructure.Persistence.Repositories;

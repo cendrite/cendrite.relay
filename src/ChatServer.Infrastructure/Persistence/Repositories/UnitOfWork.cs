@@ -1,7 +1,7 @@
 ﻿using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Domain.Abstractions;
 using ChatServer.Infrastructure.Persistence.Context;
-using Cypherly.Persistence.Outbox;
+using Cendrite.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 

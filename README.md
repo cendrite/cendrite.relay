@@ -1,1 +1,1 @@
-# Cypherly.ChatServer
+# Cendrite.ChatServer

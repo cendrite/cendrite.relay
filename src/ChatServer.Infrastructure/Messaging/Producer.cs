@@ -1,4 +1,4 @@
-﻿using Cypherly.Message.Contracts.Abstractions;
+﻿using Cendrite.Message.Contracts.Abstractions;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 

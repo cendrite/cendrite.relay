@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Cypherly.Message.Contracts" Version="3.0.3" />
+      <PackageReference Include="Cendrite.Message.Contracts" Version="4.0.0" />
       <PackageReference Include="FluentValidation" Version="12.1.1" />
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
       <PackageReference Include="MassTransit.Abstractions" Version="8.5.9" />

@@ -1,7 +1,7 @@
 ﻿using ChatServer.Application.Abstractions;
 using ChatServer.Domain.Events.Client;
-using Cypherly.Message.Contracts.Abstractions;
-using Cypherly.Message.Contracts.Messages.Client;
+using Cendrite.Message.Contracts.Abstractions;
+using Cendrite.Message.Contracts.Messages.Client;
 using Microsoft.Extensions.Logging;
 
 namespace ChatServer.Application.Features.Client.Events;

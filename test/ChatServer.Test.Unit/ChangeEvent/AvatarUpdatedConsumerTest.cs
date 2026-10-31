@@ -7,7 +7,7 @@ using ChatServer.Application.Features.ChangeEvent.Handlers;
 using ChatServer.Application.Features.ChangeEvent.Services;
 using ChatServer.Domain.Aggregates;
 using ChatServer.Domain.Entities;
-using Cypherly.Message.Contracts.Messages.Profile;
+using Cendrite.Message.Contracts.Messages.Profile;
 using FakeItEasy;
 using FluentAssertions;
 using MassTransit;

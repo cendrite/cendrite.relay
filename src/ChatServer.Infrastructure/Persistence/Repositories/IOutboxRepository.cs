@@ -1,4 +1,4 @@
-﻿using Cypherly.Persistence.Outbox;
+﻿using Cendrite.Persistence.Outbox;
 
 namespace ChatServer.Infrastructure.Persistence.Repositories;
 

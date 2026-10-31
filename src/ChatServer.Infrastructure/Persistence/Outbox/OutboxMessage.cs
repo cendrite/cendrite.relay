@@ -1,4 +1,4 @@
-﻿namespace Cypherly.Persistence.Outbox;
+﻿namespace Cendrite.Persistence.Outbox;
 
 public class OutboxMessage
 {
