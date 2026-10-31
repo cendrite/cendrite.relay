@@ -1,6 +1,6 @@
 using ChatServer.Domain.Aggregates;
 using ChatServer.Domain.Entities;
-using Cypherly.Persistence.Outbox;
+using Cendrite.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatServer.Infrastructure.Persistence.Context;

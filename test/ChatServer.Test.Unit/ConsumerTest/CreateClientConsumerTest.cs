@@ -2,8 +2,8 @@
 using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Features.Client.Consumers;
 using ChatServer.Domain.Aggregates;
-using Cypherly.Message.Contracts.Messages.Client;
-using Cypherly.Message.Contracts.Responses.Client;
+using Cendrite.Message.Contracts.Messages.Client;
+using Cendrite.Message.Contracts.Responses.Client;
 using FakeItEasy;
 using MassTransit;
 using Microsoft.Extensions.Logging;

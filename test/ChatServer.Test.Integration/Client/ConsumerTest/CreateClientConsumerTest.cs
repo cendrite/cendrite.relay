@@ -3,7 +3,7 @@ using ChatServer.Application.Contracts.Repositories;
 using ChatServer.Application.Features.Client.Consumers;
 using ChatServer.Infrastructure.Persistence.Context;
 using ChatServer.Test.Integration.Setup;
-using Cypherly.Message.Contracts.Messages.Client;
+using Cendrite.Message.Contracts.Messages.Client;
 using FakeItEasy;
 using FluentAssertions;
 using MassTransit;

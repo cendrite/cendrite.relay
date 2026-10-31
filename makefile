@@ -1,4 +1,4 @@
-SLN := Cypherly.ChatServer.sln
+SLN := Cendrite.ChatServer.sln
 
 .PHONY: restore build test clean
 

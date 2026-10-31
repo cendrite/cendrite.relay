@@ -26,7 +26,7 @@ internal static class ConnectionMultiPlexerExtensions
             {
                 AbortOnConnectFail = false,
                 EndPoints = { $"{valkeySettings.Host}:{valkeySettings.Port}" },
-                ChannelPrefix = RedisChannel.Literal("Cypherly.ChatServer.API_"),
+                ChannelPrefix = RedisChannel.Literal("Cendrite.ChatServer.API_"),
             };
 
             var multiplexer = ConnectionMultiplexer.Connect(config);

@@ -3,7 +3,7 @@ using ChatServer.Application.Features.ChangeEvent.Base;
 using ChatServer.Application.Features.ChangeEvent.Payloads;
 using ChatServer.Application.Features.ChangeEvent.Services;
 using ChatServer.Application.Specifications.Client;
-using Cypherly.Message.Contracts.Messages.Device;
+using Cendrite.Message.Contracts.Messages.Device;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 

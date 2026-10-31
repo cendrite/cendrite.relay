@@ -15,7 +15,7 @@ public static class ObservabilityExtensions
         services.AddOpenTelemetry()
             .ConfigureResource(r => r
                 .AddService(
-                    serviceName: "cypherly.chatserver.svc",
+                    serviceName: "cendrite.chatserver.svc",
                     serviceVersion: typeof(Program).Assembly.GetName().Version?.ToString(),
                     serviceInstanceId: Environment.MachineName))
             .WithTracing(b => b
