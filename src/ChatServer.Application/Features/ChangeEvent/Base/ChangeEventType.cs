@@ -14,4 +14,5 @@ public enum ChangeEventType
     UserLoggedOut,
     UserLoggedIn,
     Deleted,
+    DeviceAdded,
 }
