@@ -15,4 +15,5 @@ public enum ChangeEventType
     UserLoggedIn,
     Deleted,
     DeviceAdded,
+    DeviceLinkRequested,
 }
