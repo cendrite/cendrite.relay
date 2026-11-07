@@ -30,7 +30,7 @@ public sealed class AccountKeyRotatedConsumer(
                     "Recovery phrase changed",
                     new AccountKeyRotatedEvent
                     {
-                        ConnectionId = ctx.Message.ConnectionId,
+                        DeviceId = ctx.Message.DeviceId,
                         DeviceName = ctx.Message.DeviceName,
                     }), ctx.CancellationToken);
             }

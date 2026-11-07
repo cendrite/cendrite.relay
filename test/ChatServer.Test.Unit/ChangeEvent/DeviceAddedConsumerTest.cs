@@ -41,7 +41,7 @@ public sealed class DeviceAddedConsumerTest
         await sut.Consume(context);
 
         // Assert
-        Assert.Single(existing.Events);
+        Assert.Contains($"\"deviceId\":\"{newDevice.Id}\"", Assert.Single(existing.Events).Data);
         Assert.Empty(newDevice.Events);
         A.CallTo(() => unitOfWork.SaveChangesAsync(A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }

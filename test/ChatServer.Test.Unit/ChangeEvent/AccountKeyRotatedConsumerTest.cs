@@ -41,7 +41,7 @@ public sealed class AccountKeyRotatedConsumerTest
         await sut.Consume(context);
 
         // Assert
-        Assert.Single(other.Events);
+        Assert.Contains($"\"deviceId\":\"{rotating.Id}\"", Assert.Single(other.Events).Data);
         Assert.Empty(rotating.Events);
         A.CallTo(() => unitOfWork.SaveChangesAsync(A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }
