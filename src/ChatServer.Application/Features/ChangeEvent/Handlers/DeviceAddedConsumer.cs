@@ -31,7 +31,6 @@ public sealed class DeviceAddedConsumer(
                     new DeviceAddedEvent
                     {
                         DeviceId = ctx.Message.DeviceId,
-                        ConnectionId = ctx.Message.ConnectionId,
                         DevicePlatform = ctx.Message.DevicePlatform,
                     }), ctx.CancellationToken);
             }

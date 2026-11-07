@@ -31,7 +31,6 @@ public sealed class AccountKeyRotatedConsumer(
                     new AccountKeyRotatedEvent
                     {
                         DeviceId = ctx.Message.DeviceId,
-                        ConnectionId = ctx.Message.ConnectionId,
                         DeviceName = ctx.Message.DeviceName,
                     }), ctx.CancellationToken);
             }
