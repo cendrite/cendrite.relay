@@ -16,4 +16,5 @@ public enum ChangeEventType
     Deleted,
     DeviceAdded,
     DeviceLinkRequested,
+    AccountKeyRotated,
 }
