@@ -61,6 +61,35 @@ public class AvatarUpdatedConsumerTest
     }
 
     [Fact]
+    public async Task Consume_Given_Removed_Avatar_Should_Notify_With_No_Avatar_Key()
+    {
+        // Arrange
+        var client = new Client(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        client.AddConnection(new Connection("transientId", client.Id, HubType.ChangeEvent.ToString()));
+
+        var message = _fixture.Build<AvatarUpdatedMessage>()
+            .With(c => c.ConnectionIds, [client.ConnectionId])
+            .With(c => c.AvatarKey, (Guid?)null)
+            .Create();
+
+        A.CallTo(() => _fakeClientRepository.GetAsync(A<ISpecification<Client>>._, A<CancellationToken>._))
+            .Returns(client);
+
+        var fakeConsumeContext = A.Fake<ConsumeContext<AvatarUpdatedMessage>>();
+        A.CallTo(() => fakeConsumeContext.Message).Returns(message);
+
+        // Act
+        await _sut.Consume(fakeConsumeContext);
+
+        // Assert
+        A.CallTo(() => _fakeChangeEventNotifier.NotifyAsync("transientId",
+                A<Application.Features.ChangeEvent.Base.ChangeEvent>.That.Matches(e =>
+                    e.Data is Application.Features.ChangeEvent.Payloads.AvatarUpdatedEvent && ((Application.Features.ChangeEvent.Payloads.AvatarUpdatedEvent)e.Data).AvatarKey == null),
+                A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
     public async Task Consume_Given_No_Clients_Should_Not_Notify()
     {
         var profilePictureUpdatedMessage = _fixture.Create<AvatarUpdatedMessage>();
